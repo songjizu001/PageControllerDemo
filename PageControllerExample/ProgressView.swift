@@ -8,10 +8,10 @@
 
 import UIKit
 
-public class ProgressView: UIView {
-    public var itemFrames: [CGRect] = [CGRect]()
-    public var color: CGColor!
-    public var progress: CGFloat = 0.0 {
+class ProgressView: UIView {
+     var itemFrames: [CGRect] = [CGRect]()
+     var color: CGColor!
+     var progress: CGFloat = 0.0 {
         willSet{
             if progress == newValue {
                 return
@@ -20,32 +20,23 @@ public class ProgressView: UIView {
         }
     }
     ///进度条的速度因数，默认为 15，越小越快， 大于 0
-    public var speedFactor: CGFloat {
-        get{
-            if self.speedFactor <= 0 {
-                self.speedFactor = 15.0
-            }
-            return self.speedFactor
-        }
-        set {
-            self.speedFactor = newValue
-        }
-    }
-    public var cornerRadius: CGFloat = 0.0 {
+     lazy var speedFactor: CGFloat = 15.0
+    
+     var cornerRadius: CGFloat = 0.0 {
         didSet {
             self.setNeedsDisplay()
         }
     }
     ///调皮属性，用于实现新腾讯视频效果
-    public var naughty: Bool = false {
+     var naughty: Bool = false {
         willSet {
             self.naughty = newValue
             self.setNeedsDisplay()
         }
     }
-    public var isTriangle: Bool = false
-    public var hollow: Bool = false
-    public var hasBorder: Bool = false
+     var isTriangle: Bool = false
+     var hollow: Bool = false
+     var hasBorder: Bool = false
     
     fileprivate var _sign: Int = 0
     fileprivate var _gap: CGFloat = 0
@@ -56,12 +47,16 @@ public class ProgressView: UIView {
         super.init(frame: frame)
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    required  init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     func setProgressWithOutAnimate(_ progress: CGFloat) {
-        
+        guard self.progress != progress else {
+            return
+        }
+        self.progress = progress
+        self.setNeedsDisplay()
     }
     
     func moveToPostion(_ pos: Int) {
@@ -100,7 +95,7 @@ public class ProgressView: UIView {
         let height = self.frame.height
         var index = Int(self.progress)
         index = (index <= self.itemFrames.count - 1) ? index : self.itemFrames.count - 1
-        let rate: CGFloat = self.progress - CGFloat(index)
+        let rate = self.progress - CGFloat(index)
         guard index < itemFrames.count && index > 0 else {
             return
         }
@@ -155,7 +150,6 @@ public class ProgressView: UIView {
             ctx?.addPath(path.cgPath)
             ctx?.setStrokeColor(self.color)
             ctx?.strokePath()
-            
         }
     }
     

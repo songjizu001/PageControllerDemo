@@ -17,7 +17,6 @@ public enum MenuViewStyle {
     case  segmented // 涌入带边框,即网易新闻选项卡
     
 }
-
 public enum MenuViewLayoutMode {
     case scatter      // 默认的布局模式, item 会均匀分布在屏幕上，呈分散状
     case left        // Item 紧靠屏幕左侧
@@ -66,8 +65,8 @@ open class MenuView: UIView, MenuItemDelegate {
             guard self.scrollView != nil else {
                 return
             }
-            let leftMargin: CGFloat = self.contentMargin
-            let rightMargin: CGFloat = self.contentMargin
+            let leftMargin: CGFloat = self.contentMargin + (self.leftView?.frame.width)!
+            let rightMargin: CGFloat = self.contentMargin + (self.rightView?.frame.width)!
             let contentWidth: CGFloat = self.scrollView.frame.width + leftMargin + rightMargin
             let startX: CGFloat = (self.leftView != nil) ? self.leftView!.frame.origin.x : self.scrollView.frame.origin.x - self.contentMargin
             // Make the contentView center, because system will change menuView's frame if it's a titleView.
@@ -101,33 +100,28 @@ open class MenuView: UIView, MenuItemDelegate {
             self.resetFramesFromIndex(inde: 0)
         }
     }
-    public var progressView: ProgressView!
-    public var progressHeight: CGFloat {
-        get{
-            switch self.style {
-            case .line:
-                return getHeight(self.progressHeight)
-            case .triangle:
-                return getHeight(self.progressHeight)
-            case .flood:
-                return getHeight(self.progressHeight, CGFloat(ceil(self.frame.height * 0.8)))
-            case .segmented:
-                return getHeight(self.progressHeight, CGFloat(ceil(self.frame.height * 0.8)))
-            case .floodHollow:
-                return getHeight(self.progressHeight, CGFloat(ceil(self.frame.height * 0.8)))
-            default:
-                return self.progressHeight
-            }
+     var progressView: ProgressView!
+    lazy var progressHeight: CGFloat = {
+        switch self.style {
+        case .line:
+            return getHeight(self.progressHeight)
+        case .triangle:
+            return getHeight(self.progressHeight)
+        case .flood:
+            return getHeight(self.progressHeight, CGFloat(ceil(self.frame.height * 0.8)))
+        case .segmented:
+            return getHeight(self.progressHeight, CGFloat(ceil(self.frame.height * 0.8)))
+        case .floodHollow:
+            return getHeight(self.progressHeight, CGFloat(ceil(self.frame.height * 0.8)))
+        default:
+            return self.progressHeight
         }
-        set {
-            
-        }
-    }
+    }()
     func getHeight(_ newHeight: CGFloat, _ defaultHeight: CGFloat = 2) -> CGFloat {
         return (newHeight != defaultHeight) ? newHeight : defaultHeight
     }
-    public var style: MenuViewStyle!
-    public var layoutMode: MenuViewLayoutMode = .left {
+    var style: MenuViewStyle!
+    var layoutMode: MenuViewLayoutMode = .left {
         didSet {
             guard self.superview != nil else {
                 return
@@ -136,16 +130,13 @@ open class MenuView: UIView, MenuItemDelegate {
         }
     }
     
-    public var contentMargin: CGFloat = 0.0 {
+    var contentMargin: CGFloat = 0.0 {
         didSet {
             guard self.scrollView != nil else {
                 return
             }
             self.resetFrames()
         }
-//        get {
-//            return self.contentMargin
-//        }
     }
     
     lazy var lineColor: UIColor? = {
@@ -155,7 +146,7 @@ open class MenuView: UIView, MenuItemDelegate {
         return self.lineColor
     }()
     
-    func colorForState(state: MenuItemState, atIndex index: Int) -> UIColor? {
+    func colorForState(state: MenuItemState, atIndex index: Int) -> UIColor {
         if let color = self.delegate?.menuView?(self, titleColorForState: state, atIndex: index) {
             return color
         }
@@ -198,8 +189,8 @@ open class MenuView: UIView, MenuItemDelegate {
             }
             for (_, view) in self.scrollView.subviews.enumerated() {
                 if view is MenuItem {
-                    let itemView = view as! MenuItem
-                    itemView.speedFactor = speedFactor
+                    let itemView = view as? MenuItem
+                    itemView?.speedFactor = speedFactor
                 }
             }
         }
@@ -227,9 +218,7 @@ open class MenuView: UIView, MenuItemDelegate {
     
     //filePrivate
     fileprivate var selItem: MenuItem!
-    lazy var frames: [CGRect] = {
-        return [CGRect]()
-    }()
+    lazy var frames: [CGRect] = [CGRect]()
     fileprivate var selectIndex: Int!
     //MARK: - Data Source
     lazy var titlesCount: Int = {
@@ -348,13 +337,9 @@ open class MenuView: UIView, MenuItemDelegate {
         
     }
     
-    public func itemAtIndex(index: Int) -> MenuItem? {
+    func itemAtIndex(index: Int) -> MenuItem? {
         let view = self.viewWithTag(index + WMMENUITEM_TAG_OFFSET)
-        if view is MenuItem{
-            return (view as! MenuItem)
-        } else {
-            return nil
-        }
+        return view as? MenuItem
     }
     
     /// 立即刷新 menuView 的 contentOffset，使 title 居中
@@ -523,22 +508,19 @@ open class MenuView: UIView, MenuItemDelegate {
     }
     
     fileprivate func badgeViewAtIndex(index: Int) -> UIView? {
-        guard self.dataSource != nil else {
+        
+        if let badgeView = self.dataSource.menuView?(self, badgeViewAtIndex: index) {
+            badgeView.tag = index + WMBADGEVIEW_TAG_OFFSET
+            return badgeView
+        } else {
             return nil
         }
         
-        let badgeView = self.dataSource.menuView!(self, badgeViewAtIndex: index) ?? nil
-        guard badgeView != nil else {
-            return nil
-        }
-        badgeView?.tag = index + WMBADGEVIEW_TAG_OFFSET
-        return badgeView
     }
     
     fileprivate func resetItemFrame(_ index: Int) {
         let item = self.viewWithTag(WMMENUITEM_TAG_OFFSET + index)
-        if item is  MenuItem {
-            let menuItem = item as! MenuItem
+        if let menuItem = item as? MenuItem {
             let frame = self.frames[index]
             menuItem.frame = frame
             self.delegate?.menuView?(self, didLayoutItemFrame: menuItem, atIndex: index)
@@ -629,7 +611,7 @@ open class MenuView: UIView, MenuItemDelegate {
     
     
     //MARK: - MenuItemDelegate
-    public func didPressedMenuItem(_ menuItem: MenuItem) {
+    func didPressedMenuItem(_ menuItem: MenuItem) {
         if let should = self.delegate?.menuView?(self, shouldSelesctedIndex: menuItem.tag - WMMENUITEM_TAG_OFFSET) {
             guard should else {
                 return
@@ -653,7 +635,7 @@ open class MenuView: UIView, MenuItemDelegate {
     
     open override func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        guard self.scrollView != nil else {
+        guard self.scrollView == nil else {
             return
         }
         self.addScrollView()
@@ -678,7 +660,7 @@ open class MenuView: UIView, MenuItemDelegate {
     }
     
     fileprivate func resetSelectionIfNeeded() {
-        guard self.selectIndex > 0 else {
+        guard self.selectIndex != 0 else {
             return
         }
         self.selectItemAtIndex(self.selectIndex)
