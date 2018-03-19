@@ -122,7 +122,7 @@ open class MenuView: UIView, MenuItemDelegate {
     func getHeight(_ newHeight: CGFloat? = 2.0, _ defaultHeight: CGFloat = 2) -> CGFloat {
         return (newHeight != defaultHeight) ? newHeight! : defaultHeight
     }
-    var style: MenuViewStyle!
+    var style: MenuViewStyle = .line
     var layoutMode: MenuViewLayoutMode = .left {
         didSet {
             guard self.superview != nil else {
@@ -150,7 +150,7 @@ open class MenuView: UIView, MenuItemDelegate {
         return UIColor.black
     }
     
-    public var progressViewBottomSpace: CGFloat!
+    public var progressViewBottomSpace: CGFloat = 0
     var delegate: MenuViewDelegate?
     var dataSource: MenuViewDataSource!
     public var leftView: UIView? {
@@ -179,7 +179,7 @@ open class MenuView: UIView, MenuItemDelegate {
     public var fontName: String!
     public var scrollView: UIScrollView!
     /// 进度条的速度因数，默认为 15，越小越快， 大于 0
-    public var speedFactor: CGFloat = 0.0 {
+    public var speedFactor: CGFloat = 15.0 {
         didSet {
             if self.progressView != nil {
                 self.progressView.speedFactor = speedFactor
@@ -600,8 +600,9 @@ open class MenuView: UIView, MenuItemDelegate {
     //MARK: - Progress View
     fileprivate func addProgressViewWithFrame(_ frame: CGRect, _ isTriangle: Bool = false, _ hasBorder: Bool = false, _ isHollow: Bool = false, _ cornerRadius: CGFloat = 0.0) {
         let pView = ProgressView(frame: frame)
+        pView.backgroundColor = UIColor.yellow
         pView.itemFrames = self.convertProgressWidthsToFrames()
-        pView.color = UIColor.red.cgColor//self.lineColor?.cgColor
+        pView.color = self.lineColor?.cgColor
         pView.isTriangle = isTriangle
         pView.hasBorder = hasBorder
         pView.hollow = isHollow

@@ -28,14 +28,25 @@ class CustomViewController: PageController {
     }
     
     func pageController(_ pageController: PageController, titleAtIndex index: Int) -> String {
-        return "专题"
+        switch index % 3 {
+        case 0:return "First"
+        case 1:return "View"
+        default:return "NewView"
+    }
     }
     
     func pageController(_ pageController: PageController, viewControllerAtIndex index: Int) -> UIViewController {
-        if index % 2 == 0 {
-            return ViewController()
-        } else {
+        print("++++++++++++\(index)++++++++++++")
+        switch index % 3 {
+        case 0:
+            print("00000000000000")
+            return FirstViewController()
             
+        case 1:
+            print("1111111111111111")
+            return ViewController()
+        default:
+            print("2222222222222222")
             return UIViewController()
         }
     }

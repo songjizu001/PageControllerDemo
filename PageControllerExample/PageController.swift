@@ -486,6 +486,7 @@ open class PageController: UIViewController {
         menuView.dataSource = self
         menuView.style = self.menuViewStyle
         menuView.layoutMode = self.menuViewLayoutMode
+        menuView.progressHeight = self.progressHeight
         menuView.contentMargin = menuViewContentMargin
         menuView.progressViewBottomSpace = self.progressViewBottomSpace
         menuView.progressWidths = self.progressViewWidths ?? [0]

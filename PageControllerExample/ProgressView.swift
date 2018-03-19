@@ -20,7 +20,7 @@ class ProgressView: UIView {
         }
     }
     ///进度条的速度因数，默认为 15，越小越快， 大于 0
-     lazy var speedFactor: CGFloat = 15.0
+    var speedFactor: CGFloat = 15.0
     
      var cornerRadius: CGFloat = 0.0 {
         didSet {
