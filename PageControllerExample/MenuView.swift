@@ -65,8 +65,8 @@ open class MenuView: UIView, MenuItemDelegate {
             guard self.scrollView != nil else {
                 return
             }
-            let leftMargin: CGFloat = self.contentMargin + (self.leftView?.frame.width)!
-            let rightMargin: CGFloat = self.contentMargin + (self.rightView?.frame.width)!
+            let leftMargin: CGFloat = (rightView == nil) ? contentMargin : contentMargin + rightView!.frame.width
+            let rightMargin: CGFloat = (leftView == nil) ? contentMargin : contentMargin + leftView!.frame.width
             let contentWidth: CGFloat = self.scrollView.frame.width + leftMargin + rightMargin
             let startX: CGFloat = (self.leftView != nil) ? self.leftView!.frame.origin.x : self.scrollView.frame.origin.x - self.contentMargin
             // Make the contentView center, because system will change menuView's frame if it's a titleView.
@@ -94,6 +94,8 @@ open class MenuView: UIView, MenuItemDelegate {
     }
     public var progressWidths: [CGFloat] = [] {
         didSet {
+            guard let _ = self.progressView else { return  }
+            
             guard self.progressView.superview != nil else {
                 return
             }
@@ -117,8 +119,8 @@ open class MenuView: UIView, MenuItemDelegate {
             return self.progressHeight
         }
     }()
-    func getHeight(_ newHeight: CGFloat, _ defaultHeight: CGFloat = 2) -> CGFloat {
-        return (newHeight != defaultHeight) ? newHeight : defaultHeight
+    func getHeight(_ newHeight: CGFloat? = 2.0, _ defaultHeight: CGFloat = 2) -> CGFloat {
+        return (newHeight != defaultHeight) ? newHeight! : defaultHeight
     }
     var style: MenuViewStyle!
     var layoutMode: MenuViewLayoutMode = .left {
@@ -139,12 +141,7 @@ open class MenuView: UIView, MenuItemDelegate {
         }
     }
     
-    lazy var lineColor: UIColor? = {
-        if self.lineColor == nil {
-            self.lineColor = self.colorForState(state: .selected, atIndex: 0)
-        }
-        return self.lineColor
-    }()
+    lazy var lineColor: UIColor? = self.colorForState(state: .selected, atIndex: 0)
     
     func colorForState(state: MenuItemState, atIndex index: Int) -> UIColor {
         if let color = self.delegate?.menuView?(self, titleColorForState: state, atIndex: index) {
@@ -196,17 +193,19 @@ open class MenuView: UIView, MenuItemDelegate {
         }
     }
     
-    public var progressViewCornerRadius: CGFloat? {
+    var progressViewCornerRadius: CGFloat?
+    {
         set {
             if self.progressView != nil {
-                self.progressView.cornerRadius = progressViewCornerRadius!
+                self.progressView.cornerRadius = progressViewCornerRadius ?? 0
             }
         }
         get {
-            return getHeight(self.progressViewCornerRadius!, self.progressHeight / 2.0)
+            return 2.0
+//                self.getHeight(self.progressViewCornerRadius ?? 0, self.progressHeight / 2.0)
         }
     }
-    public var progressViewIsNaughty: Bool = false {
+    var progressViewIsNaughty: Bool = false {
         didSet {
             guard self.progressView != nil else {
                 return
@@ -219,7 +218,7 @@ open class MenuView: UIView, MenuItemDelegate {
     //filePrivate
     fileprivate var selItem: MenuItem!
     lazy var frames: [CGRect] = [CGRect]()
-    fileprivate var selectIndex: Int!
+    fileprivate var selectIndex: Int = 0
     //MARK: - Data Source
     lazy var titlesCount: Int = {
         return self.dataSource.numbersOfTitlesInMenuView(self)
@@ -234,6 +233,7 @@ open class MenuView: UIView, MenuItemDelegate {
         super.init(frame: self.frame)
         self.progressViewCornerRadius = WMUNDEFINED_VALUE
         self.progressHeight = WMUNDEFINED_VALUE
+        self.backgroundColor = UIColor.lightGray
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -280,7 +280,7 @@ open class MenuView: UIView, MenuItemDelegate {
         self.refreshContenOffset()
     }
     
-    public func resetFrames() {
+    func resetFrames() {
         var frame = self.bounds
         if let rView = rightView {
             var rightFrame = rView.frame
@@ -344,7 +344,7 @@ open class MenuView: UIView, MenuItemDelegate {
     
     /// 立即刷新 menuView 的 contentOffset，使 title 居中
     ///让选中的item位于中间
-    public func refreshContenOffset() {
+     func refreshContenOffset() {
         let frame = self.selItem.frame
         let itemX = frame.origin.x
         let width = self.scrollView.frame.size.width
@@ -395,11 +395,15 @@ open class MenuView: UIView, MenuItemDelegate {
             self.resetItemFrame(i)
             self.resetBadgeFrame(i)
         }
+        guard let _ = self.progressView  else {
+            return
+        }
+        
         guard self.progressView.superview != nil else {
             return
         }
         self.progressView.frame = self.calculateProgressViewFrame()
-        self.progressView.cornerRadius = self.progressViewCornerRadius!
+        self.progressView.cornerRadius = self.progressViewCornerRadius ?? 0
         self.progressView.itemFrames = self.convertProgressWidthsToFrames()
         self.progressView.setNeedsDisplay()
         
@@ -557,14 +561,15 @@ open class MenuView: UIView, MenuItemDelegate {
                 item.font = UIFont.systemFont(ofSize: item.selectedSize)
             }
             
-            if let newItem = self.dataSource.menuView?(self, initialMenuItem: item, atIndex: i) {
-                if i == 0 {
-                    newItem.setSelected(true, animation: false)
-                } else {
-                    newItem.setSelected(false, animation: false)
-                }
-                self.scrollView.addSubview(newItem)
+//            if let newItem = self.dataSource.menuView?(self, initialMenuItem: item, atIndex: i) {
+//            }
+            if i == 0 {
+                item.setSelected(true, animation: false)
+                self.selItem = item
+            } else {
+                item.setSelected(false, animation: false)
             }
+            self.scrollView.addSubview(item)
             
         }
     }
@@ -596,7 +601,7 @@ open class MenuView: UIView, MenuItemDelegate {
     fileprivate func addProgressViewWithFrame(_ frame: CGRect, _ isTriangle: Bool = false, _ hasBorder: Bool = false, _ isHollow: Bool = false, _ cornerRadius: CGFloat = 0.0) {
         let pView = ProgressView(frame: frame)
         pView.itemFrames = self.convertProgressWidthsToFrames()
-        pView.color = self.lineColor?.cgColor
+        pView.color = UIColor.red.cgColor//self.lineColor?.cgColor
         pView.isTriangle = isTriangle
         pView.hasBorder = hasBorder
         pView.hollow = isHollow
@@ -622,15 +627,12 @@ open class MenuView: UIView, MenuItemDelegate {
         let currentIndex = self.selItem.tag - WMMENUITEM_TAG_OFFSET
         self.delegate?.menuView?(self, didSelectedIndex: menuItem.tag - WMMENUITEM_TAG_OFFSET, currentIndex)
         self.selItem.setSelected(false, animation: true)
-        self.selItem.setSelected(true, animation: true)
+        menuItem.setSelected(true, animation: true)
+        self.selItem = menuItem
         let delay: TimeInterval = (self.style == .default) ? 0: 0.3
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delay) {
             self.refreshContenOffset()
         }
-        
-        
-        
-        
     }
     
     open override func willMove(toSuperview newSuperview: UIView?) {

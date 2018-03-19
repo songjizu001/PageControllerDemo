@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A801F7F8205F47C500E66BD1 /* CustomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A801F7F7205F47C500E66BD1 /* CustomViewController.swift */; };
 		A823155720527B24007527E4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A823155620527B24007527E4 /* AppDelegate.swift */; };
 		A823155920527B24007527E4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A823155820527B24007527E4 /* ViewController.swift */; };
 		A823155C20527B24007527E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A823155A20527B24007527E4 /* Main.storyboard */; };
@@ -39,6 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A801F7F7205F47C500E66BD1 /* CustomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewController.swift; sourceTree = "<group>"; };
 		A823155320527B24007527E4 /* PageControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PageControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A823155620527B24007527E4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A823155820527B24007527E4 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				A823158A20527C84007527E4 /* MenuView.swift */,
 				A823158C20527C9E007527E4 /* ProgressView.swift */,
 				A823158E20527CB0007527E4 /* PageController.swift */,
+				A801F7F7205F47C500E66BD1 /* CustomViewController.swift */,
 				A823155A20527B24007527E4 /* Main.storyboard */,
 				A823156020527B24007527E4 /* Assets.xcassets */,
 				A823156220527B24007527E4 /* LaunchScreen.storyboard */,
@@ -281,6 +284,7 @@
 				A823155F20527B24007527E4 /* PageControllerExample.xcdatamodeld in Sources */,
 				A823155720527B24007527E4 /* AppDelegate.swift in Sources */,
 				A823158D20527C9E007527E4 /* ProgressView.swift in Sources */,
+				A801F7F8205F47C500E66BD1 /* CustomViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

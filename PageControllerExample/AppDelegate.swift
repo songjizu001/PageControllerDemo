@@ -16,7 +16,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+       self.window = UIWindow(frame: UIScreen.main.bounds)
+        self.window?.backgroundColor = UIColor.white
+        self.window?.makeKeyAndVisible()
+        let vc = CustomViewController()
+        vc.selectIndex = 0
+        vc.showOnNavigationBar = false
+        vc.menuViewStyle = .line
+        vc.automaticallyCalculatesItemWidths = false
+        vc.progressViewIsNaughty = true
+        vc.progressWidth = 10
+        vc.progressHeight = 2
+        self.window?.rootViewController = UINavigationController(rootViewController: vc)
+        
         return true
     }
 

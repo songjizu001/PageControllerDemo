@@ -93,6 +93,7 @@ class ProgressView: UIView {
         super.draw(rect)
         let ctx = UIGraphicsGetCurrentContext()
         let height = self.frame.height
+        print("--------\(self.progress)--------")
         var index = Int(self.progress)
         index = (index <= self.itemFrames.count - 1) ? index : self.itemFrames.count - 1
         let rate = self.progress - CGFloat(index)
@@ -142,6 +143,7 @@ class ProgressView: UIView {
             return
         }
         ctx?.setFillColor(self.color)
+        ctx?.fillPath()
         if self.hasBorder {
             let startX = self.itemFrames.first?.minX
             let endX = self.itemFrames.last?.maxX
