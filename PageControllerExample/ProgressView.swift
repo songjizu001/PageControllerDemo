@@ -12,11 +12,9 @@ class ProgressView: UIView {
      var itemFrames: [CGRect] = [CGRect]()
      var color: CGColor!
      var progress: CGFloat = 0.0 {
-        willSet{
-            if progress == newValue {
-                return
-            }
-            self.setNeedsDisplay()
+        didSet {
+            print("1=================\(progress)")
+            setNeedsDisplay()
         }
     }
     ///进度条的速度因数，默认为 15，越小越快， 大于 0
@@ -52,9 +50,10 @@ class ProgressView: UIView {
     }
     
     func setProgressWithOutAnimate(_ progress: CGFloat) {
-        guard self.progress != progress else {
-            return
-        }
+//        guard self.progress != progress else {
+//            return
+//        }
+        print("2================")
         self.progress = progress
         self.setNeedsDisplay()
     }
@@ -87,19 +86,13 @@ class ProgressView: UIView {
         }
     }
     
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
     override public func draw(_ rect: CGRect) {
         super.draw(rect)
         let ctx = UIGraphicsGetCurrentContext()
         let height = self.frame.height
-        print("--------\(self.progress)--------")
         var index = Int(self.progress)
         index = (index <= self.itemFrames.count - 1) ? index : self.itemFrames.count - 1
         let rate = self.progress - CGFloat(index)
-        guard index < itemFrames.count && index > 0 else {
-            return
-        }
         let currentFrame = self.itemFrames[index]
         let currentWidth = currentFrame.width
         let nextIndex: Int = index + 1 < self.itemFrames.count ? index + 1 : index
@@ -123,7 +116,6 @@ class ProgressView: UIView {
             }
             width = endX - startX
         }
-        
         let lineWidth: CGFloat = (self.hollow || self.hasBorder) ? 1.0 : 0.0
         if self.isTriangle {
             ctx?.move(to: CGPoint(x: startX, y: height))

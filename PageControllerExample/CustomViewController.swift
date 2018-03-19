@@ -14,8 +14,6 @@ class CustomViewController: PageController {
         super.viewDidLoad()
         self.delegate = self
         self.dataSource = self
-        print(self.menuView)
-        print(self.scrollView)
     }
 
     override func didReceiveMemoryWarning() {
@@ -36,17 +34,17 @@ class CustomViewController: PageController {
     }
     
     func pageController(_ pageController: PageController, viewControllerAtIndex index: Int) -> UIViewController {
-        print("++++++++++++\(index)++++++++++++")
+//        print("++++++++++++\(index)++++++++++++")
         switch index % 3 {
         case 0:
-            print("00000000000000")
+//            print("00000000000000")
             return FirstViewController()
             
         case 1:
-            print("1111111111111111")
+//            print("1111111111111111")
             return ViewController()
         default:
-            print("2222222222222222")
+//            print("2222222222222222")
             return UIViewController()
         }
     }

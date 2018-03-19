@@ -385,7 +385,6 @@ open class PageController: UIViewController {
         viewController.didMove(toParentViewController: self)
         self.scrollView.addSubview(viewController.view)
         self.willEnterController(viewController, index)
-        print("========\(index)=========")
         self.displayVC["\(index)"] = viewController
         
     }
@@ -599,7 +598,6 @@ open class PageController: UIViewController {
         viewController.view.removeFromSuperview()
         viewController.willMove(toParentViewController: nil)
         viewController.removeFromParentViewController()
-        print("1+++++++++++++++++++\(index)")
         self.displayVC["\(index)"] = nil
         //放入缓存
         if let _ = self.memCache.object(forKey: NSNumber(integerLiteral: index)) {

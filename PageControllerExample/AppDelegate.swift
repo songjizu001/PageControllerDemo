@@ -27,8 +27,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         vc.progressColor = UIColor.blue
         vc.menuViewStyle = .line
         vc.progressViewIsNaughty = true
-//        vc.progressWidth = 10
+        vc.progressWidth = 10
         vc.progressHeight = 2
+        vc.selectIndex = 0
         self.window?.rootViewController = UINavigationController(rootViewController: vc)
         
         return true
