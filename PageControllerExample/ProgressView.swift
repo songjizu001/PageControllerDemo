@@ -10,7 +10,7 @@ import UIKit
 
 class ProgressView: UIView {
      var itemFrames: [CGRect] = [CGRect]()
-     var color: CGColor!
+     var color: CGColor = UIColor.black.cgColor
      var progress: CGFloat = 0.0 {
         didSet {
             guard progress != oldValue else {
@@ -29,8 +29,7 @@ class ProgressView: UIView {
     }
     ///调皮属性，用于实现新腾讯视频效果
      var naughty: Bool = false {
-        willSet {
-            self.naughty = newValue
+        didSet {
             self.setNeedsDisplay()
         }
     }
@@ -38,13 +37,14 @@ class ProgressView: UIView {
      var hollow: Bool = false
      var hasBorder: Bool = false
     
-    fileprivate var _sign: Int = 0
+    fileprivate var _sign: Int = 1
     fileprivate var _gap: CGFloat = 0
     fileprivate var _step: CGFloat = 0
     weak fileprivate var _link: CADisplayLink!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.backgroundColor = UIColor.lightGray
     }
     
     required  init?(coder aDecoder: NSCoder) {
@@ -55,7 +55,6 @@ class ProgressView: UIView {
         guard self.progress != progress else {
             return
         }
-//        print("2================")
         self.progress = progress
         self.setNeedsDisplay()
     }
@@ -65,7 +64,7 @@ class ProgressView: UIView {
         _sign = self.progress > CGFloat(pos) ? -1 : 1
         _step = _gap / self.speedFactor
         if _link != nil {
-            _link.invalidate()
+            _link.remove(from: .main, forMode: .commonModes)
         }
         let link = CADisplayLink(target: self, selector: #selector(progressChanged))
         link.add(to: RunLoop.main, forMode: .commonModes)
@@ -77,12 +76,12 @@ class ProgressView: UIView {
         if _gap > 0.000001 {
             _gap -= _step
             if _gap < 0.0 {
-                self.progress = self.progress + CGFloat(_sign) * _step + 0.5
+                self.progress = CGFloat(Int(self.progress + CGFloat(_sign) * _step + 0.5))
                 return
             }
             self.progress += CGFloat(_sign) * _step
         } else {
-            self.progress = self.progress + 0.5
+            self.progress = CGFloat(Int(self.progress + 0.5))
             _link.invalidate()
             _link = nil
         }

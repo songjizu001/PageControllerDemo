@@ -54,7 +54,8 @@ open class PageController: UIViewController {
     open fileprivate(set) var currentViewController: UIViewController?
     
     /// 设置选中几号 item
-    open var selectIndex: Int = 0 {
+    open var selectIndex: Int = 0
+        {
         didSet {
             markedSelectIndex = -1
             print("==============\(selectIndex)")
@@ -67,7 +68,7 @@ open class PageController: UIViewController {
                 if vc == nil {
                     vc = self.initializeViewControllerAtIndex(selectIndex)
                     self.memCache.setObject(vc, forKey: NSNumber(integerLiteral: selectIndex))
-                    
+
                 }
                 self.currentViewController = vc
             }
@@ -425,7 +426,7 @@ open class PageController: UIViewController {
     //MARK: - private method
     /// 包括宽高，子控制器视图 frame
     fileprivate func calculateSize() {
-        if let mFrame = self.dataSource?.pageController(pageController: self, preferredFrameForMenuView: self.menuView ?? nil) {
+        if let mFrame = self.dataSource?.pageController(pageController: self, preferredFrameForMenuView: self.menuView) {
             self.menuViewFrame = mFrame
             if let cFrame = dataSource?.pageController(pageController: self, preferredFrameForContentView: self.scrollView) {
                 self.contentViewFrame = cFrame
@@ -743,7 +744,6 @@ extension PageController: MenuViewDataSource, MenuViewDelegate {
         guard hasInited else {
             return
         }
-        selectIndex = index
         startDragging = false
         let targetP = CGPoint(x: contentViewFrame.width * CGFloat(index), y: 0)
         self.scrollView.setContentOffset(targetP, animated: self.pageAnimatable)
@@ -756,6 +756,7 @@ extension PageController: MenuViewDataSource, MenuViewDelegate {
             self.removeViewController(currentVC!, currentIndex)
         }
         self.layoutChildViewControllers()
+        selectIndex = index
         self.currentViewController = self.displayVC["\(selectIndex)"]
         self.didEnterController(currentViewController!, index)
         

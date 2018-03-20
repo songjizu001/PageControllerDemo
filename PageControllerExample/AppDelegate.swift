@@ -30,6 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         vc.progressWidth = 10
         vc.progressHeight = 2
         vc.selectIndex = 0
+//        vc.showOnNavigationBar = true
         self.window?.rootViewController = UINavigationController(rootViewController: vc)
         
         return true

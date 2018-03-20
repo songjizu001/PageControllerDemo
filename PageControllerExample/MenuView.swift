@@ -141,7 +141,7 @@ open class MenuView: UIView, MenuItemDelegate {
         }
     }
     
-    lazy var lineColor: UIColor? = self.colorForState(state: .selected, atIndex: 0)
+    lazy var lineColor: UIColor? = self.colorForState(state: .selected, atIndex: 0) 
     
     func colorForState(state: MenuItemState, atIndex index: Int) -> UIColor {
         if let color = self.delegate?.menuView?(self, titleColorForState: state, atIndex: index) {
@@ -233,7 +233,6 @@ open class MenuView: UIView, MenuItemDelegate {
         super.init(frame: self.frame)
         self.progressViewCornerRadius = WMUNDEFINED_VALUE
         self.progressHeight = WMUNDEFINED_VALUE
-        self.backgroundColor = UIColor.lightGray
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -276,7 +275,8 @@ open class MenuView: UIView, MenuItemDelegate {
         self.selItem.setSelected(false, animation: false)
         self.selItem = item
         self.selItem.setSelected(true, animation: false)
-        self.progressView.setProgressWithOutAnimate(CGFloat(index))
+        self.progressView.moveToPostion(index)
+//        self.progressView.setProgressWithOutAnimate(CGFloat(index))
         delegate?.menuView?(self, didSelectedIndex: index, currentIndex)
         self.refreshContenOffset()
     }
@@ -603,7 +603,7 @@ open class MenuView: UIView, MenuItemDelegate {
         let pView = ProgressView(frame: frame)
         pView.backgroundColor = UIColor.yellow
         pView.itemFrames = self.convertProgressWidthsToFrames()
-        pView.color = self.lineColor?.cgColor
+        pView.color = (self.lineColor?.cgColor)!
         pView.isTriangle = isTriangle
         pView.hasBorder = hasBorder
         pView.hollow = isHollow
