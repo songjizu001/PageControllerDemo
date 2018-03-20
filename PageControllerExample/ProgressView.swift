@@ -13,7 +13,9 @@ class ProgressView: UIView {
      var color: CGColor!
      var progress: CGFloat = 0.0 {
         didSet {
-            print("1=================\(progress)")
+            guard progress != oldValue else {
+                return
+            }
             setNeedsDisplay()
         }
     }
@@ -50,10 +52,10 @@ class ProgressView: UIView {
     }
     
     func setProgressWithOutAnimate(_ progress: CGFloat) {
-//        guard self.progress != progress else {
-//            return
-//        }
-        print("2================")
+        guard self.progress != progress else {
+            return
+        }
+//        print("2================")
         self.progress = progress
         self.setNeedsDisplay()
     }

@@ -56,6 +56,8 @@ open class PageController: UIViewController {
     /// 设置选中几号 item
     open var selectIndex: Int = 0 {
         didSet {
+            markedSelectIndex = -1
+            print("==============\(selectIndex)")
             if self.menuView != nil && hasInited {
                 self.menuView?.selectItemAtIndex(selectIndex)
             } else {
@@ -172,6 +174,7 @@ open class PageController: UIViewController {
                 self.menuView?.removeFromSuperview()
                 self.addMenuView()
                 self.forceLayoutSubviews()
+                print("1------------------")
                 self.menuView?.slideMenuAtProgress(CGFloat(self.selectIndex))
             }
         }
@@ -609,7 +612,7 @@ open class PageController: UIViewController {
     }
     
     func willEnterController(_ vc: UIViewController, _ index: Int) {
-        self.selectIndex = index
+//        selectIndex = index
         if self.childControllersCount != 0 {
             let info = self.infoWithIndex(index)
             self.delegate?.pageController?(self, didEnterViewController: vc, withInfo: info)
@@ -741,6 +744,7 @@ extension PageController: MenuViewDataSource, MenuViewDelegate {
             return
         }
         selectIndex = index
+        startDragging = false
         let targetP = CGPoint(x: contentViewFrame.width * CGFloat(index), y: 0)
         self.scrollView.setContentOffset(targetP, animated: self.pageAnimatable)
         guard !self.pageAnimatable else {
@@ -822,13 +826,14 @@ extension PageController: UIScrollViewDelegate {
         guard scrollView is WMScrollView else {
            return
         }
-        guard shouldNotScroll
-         || !hasInited  else {
+        if shouldNotScroll
+         || !hasInited {
             return
         }
         self.layoutChildViewControllers()
         if (startDragging) {
             var contentOffsetX = scrollView.contentOffset.x
+            print("3scrollViewDidScroll==========")
             if contentOffsetX < 0 {
                 contentOffsetX = 0
             }
@@ -836,6 +841,7 @@ extension PageController: UIScrollViewDelegate {
                 contentOffsetX = scrollView.contentSize.width - contentViewFrame.size.width
             }
             let rate = contentOffsetX / contentViewFrame.size.width
+            print("1scrollViewDidScroll==========\(rate)")
             self.menuView?.slideMenuAtProgress(rate)
         }
         // Fix scrollView.contentOffset.y -> (-20) unexpectedly.
@@ -845,7 +851,7 @@ extension PageController: UIScrollViewDelegate {
         var contentOffset = scrollView.contentOffset
         contentOffset.y = 0.0
         scrollView.contentOffset = contentOffset
-        
+        print("2scrollViewDidScroll==========")
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
@@ -900,7 +906,7 @@ extension PageController: UIScrollViewDelegate {
     
     
     func layoutChildViewControllers() {
-        let currentPage = self.scrollView.contentOffset.x / contentViewFrame.size.width
+        let currentPage = self.scrollView.contentOffset.x / contentViewFrame.width
         let length = self.preloadPolicy.rawValue
         let left = currentPage - CGFloat(length) - 1
         let right = currentPage + CGFloat(length) + 1

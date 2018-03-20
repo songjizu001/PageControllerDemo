@@ -244,6 +244,7 @@ open class MenuView: UIView, MenuItemDelegate {
     public func slideMenuAtProgress(_ progress: CGFloat) {
         if self.progressView != nil {
             self.progressView.progress = progress
+            print("_________________\(progress)")
         }
         let tag = Int(progress) + WMMENUITEM_TAG_OFFSET
         let rate: CGFloat = progress - CGFloat(tag) + CGFloat(WMMENUITEM_TAG_OFFSET)
