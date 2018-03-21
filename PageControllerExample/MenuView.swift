@@ -92,7 +92,7 @@ open class MenuView: UIView, MenuItemDelegate {
             }
         }
     }
-    public var progressWidths: [CGFloat] = [] {
+    open var progressWidths: [CGFloat] = [] {
         didSet {
             guard let _ = self.progressView else { return  }
             
@@ -141,14 +141,9 @@ open class MenuView: UIView, MenuItemDelegate {
         }
     }
     
-    lazy var lineColor: UIColor? = self.colorForState(state: .selected, atIndex: 0) 
+    lazy var lineColor: UIColor = self.colorForState(state: .selected, atIndex: 0)
     
-    func colorForState(state: MenuItemState, atIndex index: Int) -> UIColor {
-        if let color = self.delegate?.menuView?(self, titleColorForState: state, atIndex: index) {
-            return color
-        }
-        return UIColor.black
-    }
+
     
     public var progressViewBottomSpace: CGFloat = 0
     var delegate: MenuViewDelegate?
@@ -277,7 +272,7 @@ open class MenuView: UIView, MenuItemDelegate {
         self.selItem.setSelected(true, animation: false)
         self.progressView.moveToPostion(index)
 //        self.progressView.setProgressWithOutAnimate(CGFloat(index))
-        delegate?.menuView?(self, didSelectedIndex: index, currentIndex)
+//        delegate?.menuView?(self, didSelectedIndex: index, currentIndex)
         self.refreshContenOffset()
     }
     
@@ -389,6 +384,13 @@ open class MenuView: UIView, MenuItemDelegate {
     }
     
     //MARK: - filePrivateMethod
+   fileprivate func colorForState(state: MenuItemState, atIndex index: Int) -> UIColor {
+        if let color = self.delegate?.menuView?(self, titleColorForState: state, atIndex: index) {
+            return color
+        }
+        return UIColor.black
+    }
+    
     fileprivate func resetFramesFromIndex(inde: Int) {
         self.frames.removeAll()
         self.calculateItemFrames()
@@ -506,13 +508,13 @@ open class MenuView: UIView, MenuItemDelegate {
         let frame = self.frames[index]
         let view = self.scrollView.viewWithTag(WMBADGEVIEW_TAG_OFFSET + index)
         if let badgeView = view {
-            var badgeFrame = self.badgeViewAtIndex(index: index)?.frame
+            var badgeFrame = self.badgeViewAtIndex(index)?.frame
             badgeFrame?.origin.x += frame.origin.x
             badgeView.frame = badgeFrame ?? CGRect.zero
         }
     }
     
-    fileprivate func badgeViewAtIndex(index: Int) -> UIView? {
+    fileprivate func badgeViewAtIndex(_ index: Int) -> UIView? {
         
         if let badgeView = self.dataSource.menuView?(self, badgeViewAtIndex: index) {
             badgeView.tag = index + WMBADGEVIEW_TAG_OFFSET
@@ -538,6 +540,21 @@ open class MenuView: UIView, MenuItemDelegate {
             return size
         }
         return 15.0
+    }
+    
+    func updateAttributeTitle(_ title: NSAttributedString, _ index: Int, _ update: Bool) {
+        guard index < self.titlesCount && index > 0 else {
+            return
+        }
+        let item = self.viewWithTag(WMMENUITEM_TAG_OFFSET + index) as? MenuItem
+        item?.attributedText = title
+        guard update else {
+            return
+        }
+        self.resetFrames()
+    
+        
+        
     }
     
     func addItems() {
@@ -591,19 +608,20 @@ open class MenuView: UIView, MenuItemDelegate {
     }
     
     fileprivate func addBadgeViewAtIndex(_ index: Int) {
-        let badgeView = self.badgeViewAtIndex(index: index)
-        if let bView = badgeView {
-        self.scrollView.addSubview(bView)
+        
+        if let badgeView = self.badgeViewAtIndex(index) {
+        self.scrollView.addSubview(badgeView)
         }
         
     }
     
+    
+    
     //MARK: - Progress View
     fileprivate func addProgressViewWithFrame(_ frame: CGRect, _ isTriangle: Bool = false, _ hasBorder: Bool = false, _ isHollow: Bool = false, _ cornerRadius: CGFloat = 0.0) {
         let pView = ProgressView(frame: frame)
-        pView.backgroundColor = UIColor.yellow
         pView.itemFrames = self.convertProgressWidthsToFrames()
-        pView.color = (self.lineColor?.cgColor)!
+        pView.color = self.lineColor.cgColor
         pView.isTriangle = isTriangle
         pView.hasBorder = hasBorder
         pView.hollow = isHollow
@@ -625,16 +643,13 @@ open class MenuView: UIView, MenuItemDelegate {
             }
         }
         let progress = menuItem.tag - WMMENUITEM_TAG_OFFSET
-        self.progressView.moveToPostion(progress)
         let currentIndex = self.selItem.tag - WMMENUITEM_TAG_OFFSET
-        self.delegate?.menuView?(self, didSelectedIndex: menuItem.tag - WMMENUITEM_TAG_OFFSET, currentIndex)
+        self.progressView.moveToPostion(progress)
+        self.delegate?.menuView?(self, didSelectedIndex: progress, currentIndex)
         self.selItem.setSelected(false, animation: true)
         menuItem.setSelected(true, animation: true)
         self.selItem = menuItem
-        let delay: TimeInterval = (self.style == .default) ? 0: 0.3
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delay) {
-            self.refreshContenOffset()
-        }
+        self.refreshContenOffset()
     }
     
     open override func willMove(toSuperview newSuperview: UIView?) {

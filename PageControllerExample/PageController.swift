@@ -51,27 +51,31 @@ open class PageController: UIViewController {
     
     ///  各个控制器标题
     open var titles: [String]?
+    ///当前vc
     open fileprivate(set) var currentViewController: UIViewController?
     
     /// 设置选中几号 item
-    open var selectIndex: Int = 0
-        {
-        didSet {
+    open var selectIndex: Int {
+        set {
+            _selectIndex = newValue
             markedSelectIndex = -1
             print("==============\(selectIndex)")
-            if self.menuView != nil && hasInited {
-                self.menuView?.selectItemAtIndex(selectIndex)
-            } else {
-                markedSelectIndex = selectIndex
-                var vc: UIViewController!
-                vc = self.memCache.object(forKey: NSNumber(integerLiteral: selectIndex))
-                if vc == nil {
-                    vc = self.initializeViewControllerAtIndex(selectIndex)
-                    self.memCache.setObject(vc, forKey: NSNumber(integerLiteral: selectIndex))
-
-                }
-                self.currentViewController = vc
-            }
+            self.menuView?.selectItemAtIndex(selectIndex)
+            //            if self.menuView != nil && hasInited {
+            //            } else {
+            //                markedSelectIndex = selectIndex
+            //                var vc: UIViewController!
+            //                vc = self.memCache.object(forKey: NSNumber(integerLiteral: selectIndex))
+            //                if vc == nil {
+            //                    vc = self.initializeViewControllerAtIndex(selectIndex)
+            //                    self.memCache.setObject(vc, forKey: NSNumber(integerLiteral: selectIndex))
+            //
+            //                }
+            //                self.currentViewController = vc
+            //            }
+        }
+        get {
+            return _selectIndex
         }
     }
     /// 点击的 MenuItem 是否触发滚动动画
@@ -86,7 +90,7 @@ open class PageController: UIViewController {
             guard scrollView != nil else {
                 return
             }
-            self.scrollView.isScrollEnabled = scrollEnable
+            self.scrollView?.isScrollEnabled = scrollEnable
         }
     }
     
@@ -140,7 +144,7 @@ open class PageController: UIViewController {
         }
     }
     ///内部容器
-    open var scrollView: WMScrollView!
+    open var scrollView: WMScrollView?
     /// 调皮效果
     var progressViewIsNaughty = true {
         didSet {
@@ -175,8 +179,7 @@ open class PageController: UIViewController {
                 self.menuView?.removeFromSuperview()
                 self.addMenuView()
                 self.forceLayoutSubviews()
-                print("1------------------")
-                self.menuView?.slideMenuAtProgress(CGFloat(self.selectIndex))
+            self.menuView?.slideMenuAtProgress(CGFloat(self.selectIndex))
             }
         }
     }
@@ -225,20 +228,21 @@ open class PageController: UIViewController {
     lazy fileprivate var displayVC: [String: UIViewController] = [:]
     ///用于记录销毁的viewController的位置 (如果它是某一种scrollView的Controller的话)
     lazy fileprivate var posRecords = [String: CGPoint]()
-    lazy var backgroundCache = NSMutableDictionary()
+    lazy var backgroundCache: [NSNumber: UIViewController] = [:]
     ///收到内存警告的次数
     fileprivate var memoryWarningCount = 0
+    fileprivate var _selectIndex: Int = 0
     var childControllersCount: Int {
-    if controllerCount == -1 {
-        if let count = self.dataSource?.numbersOfChildControllersInPageController?(self) {
-            controllerCount = count
-        } else {
-            controllerCount = viewControllerClasses?.count ?? 0
+        if controllerCount == -1 {
+            if let count = self.dataSource?.numbersOfChildControllersInPageController?(self) {
+                controllerCount = count
+            } else {
+                controllerCount = viewControllerClasses?.count ?? 0
+            }
         }
-    }
         return controllerCount
     }
-   
+    
     
     
     
@@ -251,20 +255,18 @@ open class PageController: UIViewController {
         viewControllerClasses = vcClasses
     }
     
+    //重新加载
     open func reloadData() {
         self.clearDatas()
         guard self.childControllersCount != 0 else {
             return
         }
-        
-        
+        self.resetScrollView()
+        self.memCache.removeAllObjects()
+        self.resetMenuView()
+        self.viewDidLayoutSubviews()
+        self.didEnterController(self.currentViewController!, self.selectIndex)
     }
-    
-    //    open override func overrideTraitCollection(forChildViewController childViewController: UIViewController) -> UITraitCollection? {
-    //
-    //    }
-    
-    
     
     /// 更新指定序号的控制器的标题
     ///
@@ -272,7 +274,7 @@ open class PageController: UIViewController {
     ///   - title: 新的标题
     ///   - index: 目标序号
     open func updateTitle(_ title: String, atIndex index: Int) {
-        
+        self.menuView?.updateTitle(title: title, atIndex: index, andWidth: false)
     }
     
     ///  更新指定序号的控制器的标题以及他的宽度
@@ -282,18 +284,41 @@ open class PageController: UIViewController {
     ///   - index: 目标序号
     ///   - width: 对应item的新宽度
     open func updateTitle(_ title: String, atIndex index: Int, andWidth width: CGFloat) {
+        if (self.itemsWidths?.count ?? 0) > 0 && (self.itemsWidths?.count ?? 0) > index {
+            var mutableWidths = self.itemsWidths
+            mutableWidths![index] = width
+            self.itemsWidths = mutableWidths
+        } else {
+            var mutableWidths: [CGFloat] = [CGFloat]()
+            for i in 0..<self.childControllersCount {
+                let itemWidth = (i == index) ? width : self.menuItemWidth
+                mutableWidths.append(itemWidth)
+            }
+            self.itemsWidths = mutableWidths
+        }
+        self.menuView?.updateTitle(title: title, atIndex: index, andWidth: true)
     }
     
-    open func updateAttributeTitle(_ title: String, atIndex index: Int) {
-        
+    open func updateAttributeTitle(_ title: NSAttributedString, atIndex index: Int) {
+        self.menuView?.updateAttributeTitle(title: title, atIndex: index, andWidth: false)
     }
     ///当 app 即将进入后台接收到的通知
     @objc open func willResignActive(_ notification: Notification) {
+        for i in 0..<childControllersCount {
+            if let obj = memCache.object(forKey: NSNumber(integerLiteral: i)) {
+                backgroundCache[NSNumber(integerLiteral: i)] = obj
+            }
+        }
         
     }
     ///当 app 即将回到前台接收到的通知
     @objc open func willEnterForeground(_ notification: Notification){
-        
+        for key in self.backgroundCache.keys {
+            if memCache.object(forKey: key) == nil {
+                memCache.setObject(backgroundCache[key]!, forKey: key)
+            }
+        }
+        self.backgroundCache.removeAll()
     }
     
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -314,14 +339,14 @@ open class PageController: UIViewController {
         self.calculateSize()
         self.addScrollView()
         self.addMenuView()
-        self.initializedControllerWithIndexIfNeeded(self.selectIndex)
-        self.currentViewController = self.displayVC["\(self.selectIndex)"]
-        self.didEnterController(self.currentViewController!, self.selectIndex)
+        self.initializedControllerWithIndexIfNeeded(self._selectIndex)
+        self.currentViewController = self.displayVC["\(self._selectIndex)"]
+        self.didEnterController(self.currentViewController!, self._selectIndex)
         
     }
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        guard self.childControllersCount != 0 else {
+        guard self.childControllersCount > 0 else {
             return
         }
         self.forceLayoutSubviews()
@@ -333,7 +358,7 @@ open class PageController: UIViewController {
         guard self.childControllersCount != 0 else {
             return
         }
-    self.postFullyDisplayedNotificationWithCurrentIndex(self.selectIndex)
+        self.postFullyDisplayedNotificationWithCurrentIndex(self._selectIndex)
         let info = self.infoWithIndex(index)
         self.delegate?.pageController?(self, didEnterViewController: vc, withInfo: info)
         if initializedIndex == index {
@@ -359,7 +384,7 @@ open class PageController: UIViewController {
                 self.postAddToSuperViewNotificationWithIndex(i)
             }
         }
-        selectIndex = index
+        _selectIndex = index
     }
     
     //当控制器完全展示在user面前时发送通知
@@ -378,7 +403,7 @@ open class PageController: UIViewController {
         } else {
             self.addViewControllerAtIndex(index)
         }
-
+        
         self.postAddToSuperViewNotificationWithIndex(index)
         
     }
@@ -387,7 +412,7 @@ open class PageController: UIViewController {
         self.addChildViewController(viewController)
         viewController.view.frame = self.childViewFrames[index]
         viewController.didMove(toParentViewController: self)
-        self.scrollView.addSubview(viewController.view)
+        self.scrollView?.addSubview(viewController.view)
         self.willEnterController(viewController, index)
         self.displayVC["\(index)"] = viewController
         
@@ -400,8 +425,8 @@ open class PageController: UIViewController {
     }
     
     func initSetup() {
-       
-       self.delegate = self
+        
+        self.delegate = self
         self.dataSource = self
         NotificationCenter.default.addObserver(self, selector: #selector(willResignActive(_:)), name: Notification.Name.UIApplicationWillResignActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(_:)), name: Notification.Name.UIApplicationWillEnterForeground, object: nil)
@@ -413,13 +438,13 @@ open class PageController: UIViewController {
     }
     
     func forceLayoutSubviews() {
-        guard self.childControllersCount != 0 else {
+        guard self.childControllersCount > 0 else {
             return
         }
         self.calculateSize()
         self.adjustScrollViewFrame()
         self.adjustMenuViewFrame()
-    self.adjustDisplayingViewControllersFrame()
+        self.adjustDisplayingViewControllersFrame()
         
     }
     
@@ -441,12 +466,12 @@ open class PageController: UIViewController {
     
     fileprivate func adjustScrollViewFrame() {
         shouldNotScroll = true
-        let oldContentOffsetX = self.scrollView.contentOffset.x
-        let contentWidth = self.scrollView.contentSize.width
-        self.scrollView.frame = contentViewFrame
-        self.scrollView.contentSize = CGSize(width: CGFloat(self.childControllersCount) * contentViewFrame.width, height: 0)
-        let xContentOffset = (contentWidth == 0) ? CGFloat(self.selectIndex) * contentViewFrame.size.width : oldContentOffsetX / contentWidth * CGFloat(childControllersCount) * contentViewFrame.size.width
-        self.scrollView.setContentOffset(CGPoint(x: xContentOffset, y: 0), animated: false)
+        let oldContentOffsetX = self.scrollView?.contentOffset.x ?? 0
+        let contentWidth = self.scrollView?.contentSize.width ?? 0
+        self.scrollView?.frame = contentViewFrame
+        self.scrollView?.contentSize = CGSize(width: CGFloat(self.childControllersCount) * contentViewFrame.width, height: 0)
+        let xContentOffset = (contentWidth == 0) ? CGFloat(_selectIndex) * contentViewFrame.size.width : oldContentOffsetX / contentWidth * CGFloat(childControllersCount) * contentViewFrame.size.width
+        self.scrollView?.setContentOffset(CGPoint(x: xContentOffset, y: 0), animated: false)
         shouldNotScroll = false
         
     }
@@ -474,9 +499,10 @@ open class PageController: UIViewController {
             if !(self.menuView?.isUserInteractionEnabled)! {
                 self.menuView?.isUserInteractionEnabled = true
             }
-            if self.selectIndex != 0 {
-                self.menuView?.selectItemAtIndex(self.selectIndex)
+            guard selectIndex != 0 else {
+                return
             }
+            self.menuView?.selectItemAtIndex(selectIndex)
             self.view.bringSubview(toFront: self.menuView!)
         } else {
             self.addMenuView()
@@ -523,7 +549,7 @@ open class PageController: UIViewController {
         controllerCount = -1
         hasInited = false
         let maxIndex = (self.childControllersCount - 1 > 0) ? (childControllersCount - 1) : 0
-        selectIndex = self.selectIndex < self.childControllersCount ? self.selectIndex : maxIndex
+        _selectIndex = _selectIndex < childControllersCount ? _selectIndex : maxIndex
         for vc in self.displayVC.values {
             vc.view.removeFromSuperview()
             vc.willMove(toParentViewController: nil)
@@ -550,11 +576,11 @@ open class PageController: UIViewController {
     
     func resetScrollView() {
         if scrollView != nil {
-            scrollView.removeFromSuperview()
+            scrollView?.removeFromSuperview()
         }
         self.addScrollView()
-        self.addViewControllerAtIndex(self.selectIndex)
-        self.currentViewController = self.displayVC["\(self.selectIndex)"]
+        self.addViewControllerAtIndex(_selectIndex)
+        self.currentViewController = displayVC["\(_selectIndex)"]
         
     }
     
@@ -565,11 +591,10 @@ open class PageController: UIViewController {
         scrollView.backgroundColor = UIColor.white
         scrollView.delegate = self
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
         scrollView.bounces = bounces
         scrollView.isScrollEnabled = scrollEnable
-        self.view.addSubview(scrollView
-        )
+        self.view.addSubview(scrollView)
         self.scrollView = scrollView
         for gesture in scrollView.gestureRecognizers! {
             gesture.require(toFail: (self.navigationController?.interactivePopGestureRecognizer)!)
@@ -584,10 +609,10 @@ open class PageController: UIViewController {
             viewController.setValue(self.values?[index], forKey: self.keys![index])
         }
         self.addChildViewController(viewController)
-        let frame = self.childViewFrames.count == 0 ? self.childViewFrames[index] : self.view.frame
+        let frame = (self.childViewFrames.count > 0 ? self.childViewFrames[index] : self.view.frame)
         viewController.view.frame = frame
         viewController.didMove(toParentViewController: self)
-        self.scrollView.addSubview(viewController.view)
+        self.scrollView?.addSubview(viewController.view)
         self.willEnterController(viewController, index)
         self.displayVC["\(index)"] = viewController
         self.backToPositionIfNeeded(controller: viewController, index: index)
@@ -613,11 +638,11 @@ open class PageController: UIViewController {
     }
     
     func willEnterController(_ vc: UIViewController, _ index: Int) {
-//        selectIndex = index
-        if self.childControllersCount != 0 {
-            let info = self.infoWithIndex(index)
-            self.delegate?.pageController?(self, didEnterViewController: vc, withInfo: info)
+        guard childControllersCount > 0 else {
+            return
         }
+        let info = self.infoWithIndex(index)
+        self.delegate?.pageController?(self, didEnterViewController: vc, withInfo: info)
     }
     
     func infoWithIndex(_ index: Int) -> Dictionary<String, String> {
@@ -650,15 +675,15 @@ open class PageController: UIViewController {
         }
     }
     
-    func isKindOfScrollViewController(_ controller: UIViewController) -> WMScrollView? {
-        var scroll: WMScrollView?
+    func isKindOfScrollViewController(_ controller: UIViewController) -> UIScrollView? {
+        var scroll: UIScrollView?
         
-        if controller.view is WMScrollView {
-            scroll = controller.view as? WMScrollView
+        if controller.view is UIScrollView {
+            scroll = controller.view as? UIScrollView
         } else if controller.view.subviews.count >= 1 {
             let view = controller.view.subviews[0]
-            if view is WMScrollView {
-                scroll = view as? WMScrollView
+            if view is UIScrollView {
+                scroll = view as? UIScrollView
             }
         }
         return scroll
@@ -682,8 +707,8 @@ open class PageController: UIViewController {
     }
     fileprivate func isInScreen(_ frame: CGRect) -> Bool{
         let x = frame.origin.x
-        let screenWidth = self.scrollView.frame.width
-        let contentOffsetX = self.scrollView.contentOffset.x
+        let screenWidth = self.scrollView?.frame.width ?? 0
+        let contentOffsetX: CGFloat = self.scrollView?.contentOffset.x ?? 0
         if frame.maxX > contentOffsetX && x - contentOffsetX < screenWidth {
             return true
         } else {
@@ -700,11 +725,13 @@ open class PageController: UIViewController {
         return CGFloat(ceil(itemWidth))
     }
     
-    func delaySelectIndexIfNeeded() {
+   fileprivate func delaySelectIndexIfNeeded() {
         if self.markedSelectIndex != -1 {
-            self.selectIndex = self.markedSelectIndex
+            self._selectIndex = self.markedSelectIndex
         }
     }
+    
+
     
     
     
@@ -719,7 +746,7 @@ open class PageController: UIViewController {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(growCachePolicyToHigh), object: nil)
         self.memCache.removeAllObjects()
         self.posRecords.removeAll()
-       // 如果收到内存警告次数小于 3，一段时间后切换到模式 Balanced
+        // 如果收到内存警告次数小于 3，一段时间后切换到模式 Balanced
         if self.memoryWarningCount < 3 {
             self.perform(#selector(growCachePolicyAfterMemoryWarning), with: nil, afterDelay: 3.0, inModes:[RunLoopMode.commonModes])
         }
@@ -746,19 +773,19 @@ extension PageController: MenuViewDataSource, MenuViewDelegate {
         }
         startDragging = false
         let targetP = CGPoint(x: contentViewFrame.width * CGFloat(index), y: 0)
-        self.scrollView.setContentOffset(targetP, animated: self.pageAnimatable)
+        self.scrollView?.setContentOffset(targetP, animated: self.pageAnimatable)
         guard !self.pageAnimatable else {
             return
         }
-         // 由于不触发 -scrollViewDidScroll: 手动处理控制器
+        // 由于不触发 -scrollViewDidScroll: 手动处理控制器
         let currentVC = self.displayVC["\(currentIndex)"]
         if let _ = currentVC {
             self.removeViewController(currentVC!, currentIndex)
         }
         self.layoutChildViewControllers()
-        selectIndex = index
-        self.currentViewController = self.displayVC["\(selectIndex)"]
-        self.didEnterController(currentViewController!, index)
+        _selectIndex = index
+        self.currentViewController = self.displayVC["\(_selectIndex)"]
+        self.didEnterController(currentViewController!, _selectIndex)
         
     }
     
@@ -815,7 +842,7 @@ extension PageController: PageControllerDelegate, PageControllerDataSource {
     }
     
     public func pageController(pageController: PageController, preferredFrameForMenuView menuView: MenuView?) -> CGRect {
-       return CGRect.zero
+        return CGRect.zero
     }
     
     
@@ -825,10 +852,10 @@ extension PageController: PageControllerDelegate, PageControllerDataSource {
 extension PageController: UIScrollViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard scrollView is WMScrollView else {
-           return
+            return
         }
         if shouldNotScroll
-         || !hasInited {
+            || !hasInited {
             return
         }
         self.layoutChildViewControllers()
@@ -868,18 +895,18 @@ extension PageController: UIScrollViewDelegate {
             return
         }
         menuView?.isUserInteractionEnabled = true
-        self.selectIndex = Int(scrollView.contentOffset.x / contentViewFrame.size.width)
-        self.currentViewController = self.displayVC["\(selectIndex)"]
+        self._selectIndex = Int(scrollView.contentOffset.x / contentViewFrame.size.width)
+        self.currentViewController = self.displayVC["\(_selectIndex)"]
         guard let _ = self.currentViewController else { return  }
-
-        self.didEnterController(self.currentViewController!, self.selectIndex)
+        
+        self.didEnterController(self.currentViewController!, self._selectIndex)
         self.menuView?.deselectedItemsIfNeeded()
     }
     
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-       
-        self.currentViewController = self.displayVC["\(selectIndex)"]
-        self.didEnterController(self.currentViewController!, self.selectIndex)
+        
+        self.currentViewController = self.displayVC["\(_selectIndex)"]
+        self.didEnterController(self.currentViewController!, self._selectIndex)
         self.menuView?.deselectedItemsIfNeeded()
         
     }
@@ -907,7 +934,7 @@ extension PageController: UIScrollViewDelegate {
     
     
     func layoutChildViewControllers() {
-        let currentPage = self.scrollView.contentOffset.x / contentViewFrame.width
+        let currentPage = (self.scrollView?.contentOffset.x ?? 0) / contentViewFrame.width
         let length = self.preloadPolicy.rawValue
         let left = currentPage - CGFloat(length) - 1
         let right = currentPage + CGFloat(length) + 1

@@ -34,17 +34,13 @@ class CustomViewController: PageController {
     }
     
     func pageController(_ pageController: PageController, viewControllerAtIndex index: Int) -> UIViewController {
-//        print("++++++++++++\(index)++++++++++++")
         switch index % 3 {
         case 0:
-//            print("00000000000000")
             return FirstViewController()
             
         case 1:
-//            print("1111111111111111")
             return ViewController()
         default:
-//            print("2222222222222222")
             return UIViewController()
         }
     }
@@ -60,7 +56,7 @@ class CustomViewController: PageController {
     }
     
     override func pageController(pageController: PageController, preferredFrameForContentView scrollView: WMScrollView?) -> CGRect {
-        let originY = self.pageController(pageController: pageController, preferredFrameForMenuView: self.menuView ?? nil).maxY + 3
+        let originY = self.pageController(pageController: pageController, preferredFrameForMenuView: self.menuView ?? nil).maxY
         
         return CGRect(x: 0, y: originY , width: self.view.frame.width, height: self.view.frame.height - originY)
     }

@@ -112,12 +112,12 @@ class MenuItem: UILabel {
         if _gap > 0.000001 {
             _gap -= _step
             guard _gap >= 0 else {
-                 self.rate = self.rate + CGFloat(_sign) * _step + 0.5
+                 self.rate = CGFloat(Int(self.rate + CGFloat(_sign) * _step + 0.5))
                 return
             }
             self.rate += CGFloat(_sign) * _step
         } else {
-            self.rate = self.rate + 0.5
+            self.rate = CGFloat(Int(self.rate + 0.5))
             _link.invalidate()
             _link = nil
         }
