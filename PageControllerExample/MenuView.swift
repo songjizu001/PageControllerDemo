@@ -74,14 +74,14 @@ open class MenuView: UIView, MenuItemDelegate {
         didSet {
             guard let _ = self.progressView else { return  }
             
-            guard self.progressView.superview != nil else {
+            guard self.progressView?.superview != nil else {
                 return
             }
             self.resetFramesFromIndex(inde: 0)
         }
     }
     
-    var progressView: ProgressView!
+    var progressView: ProgressView?
     //进度条高度
     var progressHeight: CGFloat = -1
     //样式
@@ -140,7 +140,7 @@ open class MenuView: UIView, MenuItemDelegate {
     public var speedFactor: CGFloat = 15.0 {
         didSet {
             if self.progressView != nil {
-                self.progressView.speedFactor = speedFactor
+                self.progressView?.speedFactor = speedFactor
             }
             for (_, view) in self.scrollView.subviews.enumerated() {
                 if view is MenuItem {
@@ -157,7 +157,7 @@ open class MenuView: UIView, MenuItemDelegate {
             guard self.progressView != nil else {
                 return
             }
-            self.progressView.naughty = progressViewIsNaughty
+            self.progressView?.naughty = progressViewIsNaughty
         }
     }
     var showOnNavigationBar = false
@@ -195,7 +195,7 @@ open class MenuView: UIView, MenuItemDelegate {
     fileprivate var _progressViewCornerRadius: CGFloat {
         set {
             if self.progressView != nil {
-                self.progressView.cornerRadius = self.getHeight(self.progressViewCornerRadius, _progressHeight / 2.0)
+                self.progressView?.cornerRadius = self.getHeight(self.progressViewCornerRadius, _progressHeight / 2.0)
             }
         }
         get {
@@ -248,7 +248,7 @@ open class MenuView: UIView, MenuItemDelegate {
     //MARK: - Method
     public func slideMenuAtProgress(_ progress: CGFloat) {
         if self.progressView != nil {
-            self.progressView.progress = progress
+            self.progressView?.progress = progress
             print("_________________\(progress)")
         }
         let tag = Int(progress) + WMMENUITEM_TAG_OFFSET
@@ -282,7 +282,7 @@ open class MenuView: UIView, MenuItemDelegate {
         self.selItem?.setSelected(false, animation: false)
         self.selItem = item
         self.selItem?.setSelected(true, animation: false)
-        self.progressView.moveToPostion(index)
+        self.progressView?.moveToPostion(index)
         //        self.progressView.setProgressWithOutAnimate(CGFloat(index))
         //        delegate?.menuView?(self, didSelectedIndex: index, currentIndex)
         self.refreshContenOffset()
@@ -311,7 +311,7 @@ open class MenuView: UIView, MenuItemDelegate {
     
     public func reload() {
         self.frames.removeAll()
-        self.progressView.removeFromSuperview()
+        self.progressView?.removeFromSuperview()
         for (_, view) in self.scrollView.subviews.enumerated() {
             view.removeFromSuperview()
         }
@@ -417,13 +417,13 @@ open class MenuView: UIView, MenuItemDelegate {
             return
         }
         
-        guard self.progressView.superview != nil else {
+        guard self.progressView?.superview != nil else {
             return
         }
-        self.progressView.frame = self.calculateProgressViewFrame()
-        self.progressView.cornerRadius = _progressViewCornerRadius
-        self.progressView.itemFrames = self.convertProgressWidthsToFrames()
-        self.progressView.setNeedsDisplay()
+        self.progressView?.frame = self.calculateProgressViewFrame()
+        self.progressView?.cornerRadius = _progressViewCornerRadius
+        self.progressView?.itemFrames = self.convertProgressWidthsToFrames()
+        self.progressView?.setNeedsDisplay()
         
     }
     
@@ -645,7 +645,7 @@ open class MenuView: UIView, MenuItemDelegate {
         pView.speedFactor = self.speedFactor
         pView.backgroundColor = UIColor.clear
         self.progressView = pView
-        self.scrollView.insertSubview(self.progressView, at: 0)
+        self.scrollView.insertSubview(self.progressView!, at: 0)
         
     }
     
@@ -660,7 +660,7 @@ open class MenuView: UIView, MenuItemDelegate {
         let progress = menuItem.tag - WMMENUITEM_TAG_OFFSET
         guard let _ = self.selItem else { return }
         let currentIndex = (self.selItem?.tag)! - WMMENUITEM_TAG_OFFSET
-        self.progressView.moveToPostion(progress)
+        self.progressView?.moveToPostion(progress)
         self.delegate?.menuView?(self, didSelectedIndex: progress, currentIndex)
         self.selItem?.setSelected(false, animation: true)
         menuItem.setSelected(true, animation: true)

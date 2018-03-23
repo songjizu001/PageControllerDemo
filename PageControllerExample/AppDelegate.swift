@@ -31,8 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         vc.titleColorNormal = UIColor(red: 168.0/255.0, green: 20.0/255.0, blue: 4/255.0, alpha: 1)
         vc.progressColor = UIColor(red: 168.0/255.0, green: 20.0/255.0, blue: 4/255.0, alpha: 1)
         vc.titleColorSelected = UIColor.white
-            //UIColor(red: 168.0/255.0, green: 20.0/255.0, blue: 4/255.0, alpha: 1)
-//        vc.menuViewLayoutMode = .left
         self.window?.rootViewController = UINavigationController(rootViewController: vc)
         
         return true
