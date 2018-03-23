@@ -7,37 +7,9 @@
 //
 
 import UIKit
-public enum CachePolicy: Int {
-    case noLimit    = 0
-    case lowMemory  = 1
-    case balanced   = 3
-    case high       = 5
-}
-
-public enum PreloadPolicy: Int {
-    case never      = 0
-    case neighbour  = 1
-    case near       = 2
-}
 
 public let WMPageControllerDidMovedToSuperViewNotification = "WMPageControllerDidMovedToSuperViewNotification"
 public let WMPageControllerDidFullyDisplayedNotification = "WMPageControllerDidFullyDisplayedNotification"
-
-@objc public protocol PageControllerDataSource: NSObjectProtocol {
-    @objc optional func numbersOfChildControllersInPageController(_ pageController:PageController) -> Int
-    @objc optional func pageController(_ pageController: PageController, viewControllerAtIndex index: Int) -> UIViewController
-    @objc optional func pageController(_ pageController: PageController, titleAtIndex index: Int) -> String
-    func pageController(pageController: PageController, preferredFrameForContentView scrollView: WMScrollView?) -> CGRect
-    func pageController(pageController: PageController, preferredFrameForMenuView menuView: MenuView?) -> CGRect
-    
-}
-
-@objc public protocol PageControllerDelegate: NSObjectProtocol {
-    @objc optional func pageController(_ pageController: PageController, lazyLoadViewController viewController: UIViewController, withInfo info: Dictionary<String, String>)
-    @objc optional func pageController(_ pageController: PageController, willCachedViewController viewController: UIViewController, withInfo info: Dictionary<String, String>)
-    @objc optional func pageController(_ pageController: PageController, willEnterViewController viewController: UIViewController, withInfo info: Dictionary<String, String>)
-    @objc optional func pageController(_ pageController: PageController, didEnterViewController viewController: UIViewController, withInfo info: Dictionary<String, String>)
-}
 
 open class PageController: UIViewController {
     // MARK: - Public vars

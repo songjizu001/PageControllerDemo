@@ -21,6 +21,8 @@
 		A823158B20527C84007527E4 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A823158A20527C84007527E4 /* MenuView.swift */; };
 		A823158D20527C9E007527E4 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A823158C20527C9E007527E4 /* ProgressView.swift */; };
 		A823158F20527CB0007527E4 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A823158E20527CB0007527E4 /* PageController.swift */; };
+		A86857D12064F663000A3DEB /* ProtocolMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86857D02064F663000A3DEB /* ProtocolMethod.swift */; };
+		A86857D32064F788000A3DEB /* EnumConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86857D22064F788000A3DEB /* EnumConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +63,8 @@
 		A823158A20527C84007527E4 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		A823158C20527C9E007527E4 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		A823158E20527CB0007527E4 /* PageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageController.swift; sourceTree = "<group>"; };
+		A86857D02064F663000A3DEB /* ProtocolMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolMethod.swift; sourceTree = "<group>"; };
+		A86857D22064F788000A3DEB /* EnumConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +118,8 @@
 				A823155620527B24007527E4 /* AppDelegate.swift */,
 				A823155820527B24007527E4 /* ViewController.swift */,
 				A801F7F9205F874200E66BD1 /* FirstViewController.swift */,
+				A86857D02064F663000A3DEB /* ProtocolMethod.swift */,
+				A86857D22064F788000A3DEB /* EnumConfiguration.swift */,
 				A823158720527BA8007527E4 /* MenuItem.swift */,
 				A823158A20527C84007527E4 /* MenuView.swift */,
 				A823158C20527C9E007527E4 /* ProgressView.swift */,
@@ -281,6 +287,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A801F7FA205F874200E66BD1 /* FirstViewController.swift in Sources */,
+				A86857D32064F788000A3DEB /* EnumConfiguration.swift in Sources */,
 				A823158B20527C84007527E4 /* MenuView.swift in Sources */,
 				A823155920527B24007527E4 /* ViewController.swift in Sources */,
 				A823158820527BA8007527E4 /* MenuItem.swift in Sources */,
@@ -289,6 +296,7 @@
 				A823155720527B24007527E4 /* AppDelegate.swift in Sources */,
 				A823158D20527C9E007527E4 /* ProgressView.swift in Sources */,
 				A801F7F8205F47C500E66BD1 /* CustomViewController.swift in Sources */,
+				A86857D12064F663000A3DEB /* ProtocolMethod.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

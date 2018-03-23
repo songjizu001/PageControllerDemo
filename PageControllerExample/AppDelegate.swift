@@ -20,17 +20,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.backgroundColor = UIColor.white
         self.window?.makeKeyAndVisible()
         let vc = CustomViewController()
-        vc.showOnNavigationBar = true
+        vc.showOnNavigationBar = false
         vc.automaticallyCalculatesItemWidths = true
-        vc.menuViewStyle = .segmented
-//        vc.progressWidth = 6
-//        vc.progressHeight = 4
+        vc.menuViewStyle = .triangle
+        vc.progressWidth = 6
+        vc.progressHeight = 4
         vc.progressViewIsNaughty = false
         vc.selectIndex = 0
         vc.menuViewLayoutMode = .center
         vc.titleColorNormal = UIColor(red: 168.0/255.0, green: 20.0/255.0, blue: 4/255.0, alpha: 1)
         vc.progressColor = UIColor(red: 168.0/255.0, green: 20.0/255.0, blue: 4/255.0, alpha: 1)
-        vc.titleColorSelected = UIColor.white
+//        vc.progressViewBottomSpace = 20
+        vc.titleColorSelected = UIColor.black
         self.window?.rootViewController = UINavigationController(rootViewController: vc)
         
         return true

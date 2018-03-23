@@ -7,15 +7,6 @@
 //
 
 import UIKit
-
-@objc enum MenuItemState: Int {
-    case selected
-    case normal
-}
-
- protocol MenuItemDelegate: NSObjectProtocol {
-    func didPressedMenuItem(_ menuItem: MenuItem)
-}
 class MenuItem: UILabel {
     ///设置rate，并刷新标题状态
     var rate: CGFloat = 0.0 {

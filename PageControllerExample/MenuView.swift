@@ -8,65 +8,6 @@
 
 import UIKit
 
-public enum MenuViewStyle {
-    case `default`// 默认
-    case  line// 带下划线 (若要选中字体大小不变，设置选中和非选中大小一样即可)
-    case  triangle // 三角形 (progressHeight 为三角形的高, progressWidths 为底边长)
-    case  flood // 涌入效果 (填充)
-    case  floodHollow // 涌入效果 (空心的)
-    case  segmented // 涌入带边框,即网易新闻选项卡
-    
-}
-
-public enum MenuViewLayoutMode {
-    case scatter      // 默认的布局模式, item 会均匀分布在屏幕上，呈分散状
-    case left        // Item 紧靠屏幕左侧
-    case right       // Item 紧靠屏幕右侧
-    case center      // Item 紧挨且居中分布
-}
-
-@objc protocol MenuViewDelegate: NSObjectProtocol {
-    @objc optional func menuView(_ menu: MenuView, shouldSelesctedIndex index: Int ) -> Bool
-    @objc optional func menuView(_ menu: MenuView, didSelectedIndex index: Int, _ currentIndex: Int)
-    @objc optional func menuView(_ menu: MenuView, widthForItemAtIndex index: Int) -> CGFloat
-    @objc optional func menuView(_ menu: MenuView, itemMarginAtIndex index: Int) -> CGFloat
-    @objc optional func menuView(_ menu: MenuView, titleSizeForState state: MenuItemState, atIndex index: Int) -> CGFloat
-    @objc optional func menuView(_ menu: MenuView, titleColorForState state: MenuItemState, atIndex index: Int) -> UIColor
-    @objc optional func menuView(_ menu: MenuView, didLayoutItemFrame menuItem: MenuItem, atIndex index: Int)
-}
-
-@objc protocol MenuViewDataSource: NSObjectProtocol {
-    
-    /// 标题数量
-    ///
-    /// - Parameter menuView: menuView
-    func numbersOfTitlesInMenuView(_ menuView: MenuView) -> Int
-    
-    /// 获取标题
-    ///
-    /// - Parameters:
-    ///   - menuView: menuView
-    ///   - index: 下标
-    func menuView(_ menuView: MenuView, titleAtIndex index: Int) -> String
-    
-    /// 角标 (例如消息提醒的小红点) 的数据源方法，在 WMPageController 中实现这个方法来为 menuView 提供一个 badgeView  需要在返回的时候同时设置角标的 frame 属性，该 frame 为相对于 menuItem 的位置
-    ///
-    /// - Parameters:
-    ///   - menu: menuView
-    ///   - index: 角标的序号
-    /// - Returns: 返回一个设置好 frame 的角标视图
-    @objc optional func menuView(_ menu: MenuView, badgeViewAtIndex index: Int) -> UIView?
-    
-    
-    /// 用于定制 MenuItem，可以对传出的 initialMenuItem 进行修改定制，也可以返回自己创建的子类，需要注意的是，此时的 item 的 frame 是不确定的，所以请勿根据此时的 frame 做计算！如需根据 frame 修改，请使用代理
-    ///
-    /// - Parameters:
-    ///   - menu: 当前的 menuView,frame 也是不确定的
-    ///   - item: 初始化完成的 menuItem
-    ///   - index: Item 所属的位置
-    /// - Returns: 定制完成的 MenuItem
-    @objc optional func menuView(_ menu: MenuView, initialMenuItem item: MenuItem, atIndex index: Int) -> MenuItem
-}
 
 open class MenuView: UIView, MenuItemDelegate {
     //自定义进度条宽度
@@ -94,7 +35,7 @@ open class MenuView: UIView, MenuItemDelegate {
             self.reload()
         }
     }
-    
+    //边距
     var contentMargin: CGFloat = 0.0 {
         didSet {
             guard self.scrollView != nil else {
@@ -103,15 +44,13 @@ open class MenuView: UIView, MenuItemDelegate {
             self.resetFrames()
         }
     }
-    
+    //progressView进度条颜色
     lazy var lineColor: UIColor = self.colorForState(state: .selected, atIndex: 0)
-    
-    
-    
-    public var progressViewBottomSpace: CGFloat = 0
+    ///triangle,line有作用
+    var progressViewBottomSpace: CGFloat = 0
     var delegate: MenuViewDelegate?
     var dataSource: MenuViewDataSource!
-    public var leftView: UIView? {
+    var leftView: UIView? {
         willSet {
             leftView?.removeFromSuperview()
         }
@@ -123,7 +62,7 @@ open class MenuView: UIView, MenuItemDelegate {
         }
     }
     
-    public var rightView: UIView? {
+    var rightView: UIView? {
         willSet {
             rightView?.removeFromSuperview()
         }
@@ -134,15 +73,15 @@ open class MenuView: UIView, MenuItemDelegate {
             self.resetFrames()
         }
     }
-    public var fontName: String!
-    public var scrollView: UIScrollView!
+    var fontName: String?
+    var scrollView: UIScrollView?
     /// 进度条的速度因数，默认为 15，越小越快， 大于 0
     public var speedFactor: CGFloat = 15.0 {
         didSet {
             if self.progressView != nil {
                 self.progressView?.speedFactor = speedFactor
             }
-            for (_, view) in self.scrollView.subviews.enumerated() {
+            for (_, view) in (self.scrollView?.subviews.enumerated())! {
                 if view is MenuItem {
                     let itemView = view as? MenuItem
                     itemView?.speedFactor = speedFactor
@@ -209,8 +148,8 @@ open class MenuView: UIView, MenuItemDelegate {
             }
             let leftMargin: CGFloat = (rightView == nil) ? contentMargin : contentMargin + rightView!.frame.width
             let rightMargin: CGFloat = (leftView == nil) ? contentMargin : contentMargin + leftView!.frame.width
-            let contentWidth: CGFloat = self.scrollView.frame.width + leftMargin + rightMargin
-            let startX: CGFloat = (self.leftView != nil) ? self.leftView!.frame.origin.x : self.scrollView.frame.origin.x - self.contentMargin
+            let contentWidth: CGFloat = (self.scrollView?.frame.width ?? 0) + leftMargin + rightMargin
+            let startX: CGFloat = (self.leftView != nil) ? self.leftView!.frame.origin.x : (self.scrollView?.frame.origin.x ?? 0) - self.contentMargin
             // Make the contentView center, because system will change menuView's frame if it's a titleView.
             if startX + contentWidth / 2 != self.bounds.size.width / 2 {
                 let xOffset: CGFloat = (self.bounds.size.width - contentWidth) / 2
@@ -220,14 +159,14 @@ open class MenuView: UIView, MenuItemDelegate {
                     return frame ?? CGRect.zero
                 }()
                 
-                self.scrollView.frame = {
-                    var frame = self.scrollView.frame
+                self.scrollView?.frame = {
+                    var frame = self.scrollView?.frame ?? CGRect.zero
                     frame.origin.x = (self.leftView != nil) ? (self.leftView?.frame.maxX)! + self.contentMargin : xOffset
                     return frame
                 }()
                 self.rightView?.frame = {
                     var frame = self.rightView?.frame
-                    frame?.origin.x = self.scrollView.frame.maxX + self.contentMargin
+                    frame?.origin.x = (self.scrollView?.frame.maxX ?? 0) + self.contentMargin
                     return frame!
                 }()
                 
@@ -305,14 +244,14 @@ open class MenuView: UIView, MenuItemDelegate {
         }
         frame.origin.x += self.contentMargin
         frame.size.width -= self.contentMargin * 2
-        self.scrollView.frame = frame
+        self.scrollView?.frame = frame
         self.resetFramesFromIndex(inde: 0)
     }
     
     public func reload() {
         self.frames.removeAll()
         self.progressView?.removeFromSuperview()
-        for (_, view) in self.scrollView.subviews.enumerated() {
+        for (_, view) in (self.scrollView?.subviews.enumerated())! {
             view.removeFromSuperview()
         }
         self.addItems()
@@ -355,8 +294,8 @@ open class MenuView: UIView, MenuItemDelegate {
     func refreshContenOffset() {
         let frame = self.selItem?.frame
         let itemX = frame?.origin.x ?? 0
-        let width = self.scrollView.frame.size.width
-        let contentSize = self.scrollView.contentSize
+        let width = self.scrollView?.frame.size.width ?? 0
+        let contentSize = self.scrollView?.contentSize ?? CGSize.zero
         if itemX > width / 2 {
             var targetX : CGFloat = 0
             if (contentSize.width - itemX) <= width / 2 {
@@ -368,15 +307,15 @@ open class MenuView: UIView, MenuItemDelegate {
             if targetX + width > contentSize.width {
                 targetX = contentSize.width - width
             }
-            self.scrollView.setContentOffset(CGPoint(x: targetX, y: 0), animated: true)
+            self.scrollView?.setContentOffset(CGPoint(x: targetX, y: 0), animated: true)
             
         } else {
-            self.scrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
+            self.scrollView?.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
         }
     }
     
     public func deselectedItemsIfNeeded() {
-        for (_, view) in self.scrollView.subviews.enumerated() {
+        for (_, view) in (self.scrollView?.subviews.enumerated())! {
             guard view is MenuItem, view != self.selItem else {
                 return
             }
@@ -387,7 +326,7 @@ open class MenuView: UIView, MenuItemDelegate {
     }
     
     public func updateBadgeViewAtIndex(index: Int) {
-        let oldBadgeView = self.scrollView.viewWithTag(WMBADGEVIEW_TAG_OFFSET + index)
+        let oldBadgeView = self.scrollView?.viewWithTag(WMBADGEVIEW_TAG_OFFSET + index)
         if oldBadgeView != nil {
             oldBadgeView?.removeFromSuperview()
         }
@@ -451,16 +390,16 @@ open class MenuView: UIView, MenuItemDelegate {
     fileprivate func calculateProgressViewFrame() -> CGRect {
         switch self.style {
         case .triangle:
-            return CGRect(x: 0, y: self.frame.height - _progressHeight - self.progressViewBottomSpace, width: self.scrollView.contentSize.width, height: _progressHeight)
+            return CGRect(x: 0, y: self.frame.height - _progressHeight - self.progressViewBottomSpace, width: (self.scrollView?.contentSize.width ?? 0), height: _progressHeight)
         case .line:
-            return CGRect(x: 0, y: self.frame.height - _progressHeight - self.progressViewBottomSpace, width: self.scrollView.contentSize.width, height: _progressHeight)
+            return CGRect(x: 0, y: self.frame.height - _progressHeight - self.progressViewBottomSpace, width: (self.scrollView?.contentSize.width ?? 0), height: _progressHeight)
             
         case .floodHollow:
-            return CGRect(x:0, y:(self.frame.size.height - _progressHeight) / 2, width:self.scrollView.contentSize.width, height:_progressHeight)
+            return CGRect(x:0, y:(self.frame.size.height - _progressHeight) / 2, width:(self.scrollView?.contentSize.width ?? 0), height:_progressHeight)
         case .flood:
-            return CGRect(x:0, y:(self.frame.size.height - _progressHeight) / 2, width:self.scrollView.contentSize.width, height:_progressHeight)
+            return CGRect(x:0, y:(self.frame.size.height - _progressHeight) / 2, width:(self.scrollView?.contentSize.width ?? 0), height:_progressHeight)
         case .segmented:
-            return CGRect(x:0, y:(self.frame.size.height - _progressHeight) / 2, width:self.scrollView.contentSize.width, height:_progressHeight )
+            return CGRect(x:0, y:(self.frame.size.height - _progressHeight) / 2, width:(self.scrollView?.contentSize.width ?? 0), height:_progressHeight )
         default:
             return CGRect.zero
         }
@@ -478,8 +417,8 @@ open class MenuView: UIView, MenuItemDelegate {
             contentWidth += itemW + self.itemMarginAtIndex(i + 1)
         }
         // 如果总宽度小于屏幕宽,重新计算frame,为item间添加间距
-        if contentWidth < self.scrollView.frame.width {
-            let distance = self.scrollView.frame.width - contentWidth
+        if contentWidth < (self.scrollView?.frame.width ?? 0) {
+            let distance = (self.scrollView?.frame.width ?? 0) - contentWidth
             var shiftDis: (_ index: Int) -> CGFloat
             switch self.layoutMode {
             case .scatter:
@@ -505,9 +444,9 @@ open class MenuView: UIView, MenuItemDelegate {
                 frame.origin.x += shiftDis(i)
                 self.frames[i] = frame
             }
-            contentWidth = self.scrollView.frame.width
+            contentWidth = self.scrollView?.frame.width ?? 0
         }
-        self.scrollView.contentSize = CGSize(width: contentWidth, height: self.frame.height)
+        self.scrollView?.contentSize = CGSize(width: contentWidth, height: self.frame.height)
         
     }
     
@@ -521,7 +460,7 @@ open class MenuView: UIView, MenuItemDelegate {
     
     fileprivate func resetBadgeFrame(_ index: Int) {
         let frame = self.frames[index]
-        let view = self.scrollView.viewWithTag(WMBADGEVIEW_TAG_OFFSET + index)
+        let view = self.scrollView?.viewWithTag(WMBADGEVIEW_TAG_OFFSET + index)
         if let badgeView = view {
             var badgeFrame = self.badgeViewAtIndex(index)?.frame
             badgeFrame?.origin.x += frame.origin.x
@@ -602,7 +541,7 @@ open class MenuView: UIView, MenuItemDelegate {
             } else {
                 item.setSelected(false, animation: false)
             }
-            self.scrollView.addSubview(item)
+            self.scrollView?.addSubview(item)
             
         }
     }
@@ -625,7 +564,7 @@ open class MenuView: UIView, MenuItemDelegate {
     fileprivate func addBadgeViewAtIndex(_ index: Int) {
         
         if let badgeView = self.badgeViewAtIndex(index) {
-            self.scrollView.addSubview(badgeView)
+            self.scrollView?.addSubview(badgeView)
         }
         
     }
@@ -645,7 +584,7 @@ open class MenuView: UIView, MenuItemDelegate {
         pView.speedFactor = self.speedFactor
         pView.backgroundColor = UIColor.clear
         self.progressView = pView
-        self.scrollView.insertSubview(self.progressView!, at: 0)
+        self.scrollView?.insertSubview(self.progressView!, at: 0)
         
     }
     
