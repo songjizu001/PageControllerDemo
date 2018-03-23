@@ -16,12 +16,11 @@ class ProgressView: UIView {
             guard progress != oldValue else {
                 return
             }
-            setNeedsDisplay()
+          setNeedsDisplay()
         }
     }
     ///进度条的速度因数，默认为 15，越小越快， 大于 0
     var speedFactor: CGFloat = 15.0
-    
      var cornerRadius: CGFloat = 0.0 {
         didSet {
             self.setNeedsDisplay()
@@ -37,14 +36,15 @@ class ProgressView: UIView {
      var hollow: Bool = false
      var hasBorder: Bool = false
     
-    fileprivate var _sign: Int = 1
-    fileprivate var _gap: CGFloat = 0
-    fileprivate var _step: CGFloat = 0
-    weak fileprivate var _link: CADisplayLink!
+    
+    fileprivate var sign: Int = 1
+    fileprivate var gap: CGFloat = 0
+    fileprivate var step: CGFloat = 0
+    weak fileprivate var link: CADisplayLink!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = UIColor.lightGray
+        self.backgroundColor = UIColor.clear
     }
     
     required  init?(coder aDecoder: NSCoder) {
@@ -60,30 +60,29 @@ class ProgressView: UIView {
     }
     
     func moveToPostion(_ pos: Int) {
-        _gap = CGFloat(fabs(Double(self.progress - CGFloat(pos))))
-        _sign = self.progress > CGFloat(pos) ? -1 : 1
-        _step = _gap / self.speedFactor
-        if _link != nil {
-            _link.remove(from: .main, forMode: .commonModes)
+        gap = CGFloat(fabs(Double(self.progress - CGFloat(pos))))
+        sign = self.progress > CGFloat(pos) ? -1 : 1
+        step = gap / self.speedFactor
+        if link != nil {
+            link.remove(from: .main, forMode: .commonModes)
         }
-        let link = CADisplayLink(target: self, selector: #selector(progressChanged))
-        link.add(to: RunLoop.main, forMode: .commonModes)
-        _link = link
-        
+        let displayLink = CADisplayLink(target: self, selector: #selector(progressChanged))
+        displayLink.add(to: RunLoop.main, forMode: .commonModes)
+        link = displayLink
     }
     
     @objc func progressChanged() {
-        if _gap > 0.000001 {
-            _gap -= _step
-            if _gap < 0.0 {
-                self.progress = CGFloat(Int(self.progress + CGFloat(_sign) * _step + 0.5))
+        if gap > 0.000001 {
+            gap -= step
+            if gap < 0.0 {
+                self.progress = CGFloat(Int(self.progress + CGFloat(sign) * step + 0.5))
                 return
             }
-            self.progress += CGFloat(_sign) * _step
+            self.progress += CGFloat(sign) * step
         } else {
             self.progress = CGFloat(Int(self.progress + 0.5))
-            _link.invalidate()
-            _link = nil
+            link.invalidate()
+            link = nil
         }
     }
     
@@ -138,14 +137,13 @@ class ProgressView: UIView {
         ctx?.setFillColor(self.color)
         ctx?.fillPath()
         if self.hasBorder {
-            let startX = self.itemFrames.first?.minX
-            let endX = self.itemFrames.last?.maxX
-            let path = UIBezierPath(roundedRect: CGRect(x: startX ?? 0, y: lineWidth / 2.0, width: (endX ?? 0 - (startX ?? 0)), height: height - lineWidth), cornerRadius: self.cornerRadius)
+            let startX = self.itemFrames.first?.minX ?? 0
+            let endX = self.itemFrames.last?.maxX ?? 0
+            let path = UIBezierPath(roundedRect: CGRect(x: startX, y: lineWidth / 2.0, width: (endX - startX), height: height - lineWidth), cornerRadius: self.cornerRadius)
             ctx?.setLineWidth(lineWidth)
             ctx?.addPath(path.cgPath)
             ctx?.setStrokeColor(self.color)
             ctx?.strokePath()
         }
     }
-    
 }

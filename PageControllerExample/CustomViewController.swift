@@ -22,7 +22,7 @@ class CustomViewController: PageController {
     }
     
     func numbersOfChildControllersInPageController(_ pageController: PageController) -> Int {
-        return 20
+        return 3
     }
     
     func pageController(_ pageController: PageController, titleAtIndex index: Int) -> String {

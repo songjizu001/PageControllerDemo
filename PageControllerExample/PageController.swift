@@ -59,20 +59,7 @@ open class PageController: UIViewController {
         set {
             _selectIndex = newValue
             markedSelectIndex = -1
-            print("==============\(selectIndex)")
             self.menuView?.selectItemAtIndex(selectIndex)
-            //            if self.menuView != nil && hasInited {
-            //            } else {
-            //                markedSelectIndex = selectIndex
-            //                var vc: UIViewController!
-            //                vc = self.memCache.object(forKey: NSNumber(integerLiteral: selectIndex))
-            //                if vc == nil {
-            //                    vc = self.initializeViewControllerAtIndex(selectIndex)
-            //                    self.memCache.setObject(vc, forKey: NSNumber(integerLiteral: selectIndex))
-            //
-            //                }
-            //                self.currentViewController = vc
-            //            }
         }
         get {
             return _selectIndex
@@ -527,7 +514,7 @@ open class PageController: UIViewController {
         }
         
         if let pColor = progressColor {
-            self.menuView?.lineColor = pColor
+            menuView.lineColor = pColor
         }
         if self.showOnNavigationBar && self.navigationController?.navigationBar != nil {
             self.navigationItem.titleView = menuView

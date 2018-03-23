@@ -23,10 +23,10 @@ class MenuItem: UILabel {
             guard rate >= 0.0 && rate <= 1.0 else {
                 return
             }
-            let r = _normalRed + (_selectedRed - _normalRed) * rate
-            let g = _normalGreen + (_selectedGreen - _normalGreen) * rate
-            let b = _normalBlue + (_selectedBlue - _normalBlue) * rate
-            let a = _normalAlpha + (_selectedAlpha - _normalAlpha) * rate
+            let r = normalRed + (selectedRed - normalRed) * rate
+            let g = normalGreen + (selectedGreen - normalGreen) * rate
+            let b = normalBlue + (selectedBlue - normalBlue) * rate
+            let a = normalAlpha + (selectedAlpha - normalAlpha) * rate
             self.textColor = UIColor(red: r, green: g, blue: b, alpha: a)
             let minScale: CGFloat = self.normalSize / self.selectedSize
             let trueScale = minScale + (1 - minScale) * rate
@@ -40,34 +40,34 @@ class MenuItem: UILabel {
     ///Normal状态的字体颜色，默认为黑色
     var normalColor: UIColor = UIColor.black {
         didSet {
-            normalColor.getRed(&_normalRed, green: &_normalGreen, blue: &_normalBlue, alpha: &_normalAlpha)
+            normalColor.getRed(&normalRed, green: &normalGreen, blue: &normalBlue, alpha: &normalAlpha)
         }
     }
     ///Selected状态的字体颜色，默认为红色 (可动画)
     var selectedColor: UIColor = UIColor.black {
         didSet {
-        self.selectedColor.getRed(&_selectedRed, green: &_selectedGreen, blue: &_selectedBlue, alpha: &_selectedAlpha)
+        self.selectedColor.getRed(&selectedRed, green: &selectedGreen, blue: &selectedBlue, alpha: &selectedAlpha)
         }
         
     }
     ///进度条的速度因数，默认 15，越小越快, 必须大于0
     lazy var speedFactor: CGFloat = 15.0
     weak var delegate: MenuItemDelegate?
+    //选中状态
     var selected: Bool = false
-    
     //MARK: - private var
-    fileprivate var _selectedRed: CGFloat = 0
-    fileprivate var _selectedGreen: CGFloat = 0
-    fileprivate var _selectedBlue: CGFloat = 0
-    fileprivate var _selectedAlpha: CGFloat = 0
-    fileprivate var _normalRed: CGFloat = 0
-    fileprivate var _normalGreen: CGFloat = 0
-    fileprivate var _normalBlue: CGFloat = 0
-    fileprivate var _normalAlpha: CGFloat = 0
-    fileprivate var _sign: Int = 0
-    fileprivate var _gap: CGFloat = 0
-    fileprivate var _step: CGFloat = 0
-    fileprivate var _link: CADisplayLink!
+    fileprivate var selectedRed: CGFloat = 0
+    fileprivate var selectedGreen: CGFloat = 0
+    fileprivate var selectedBlue: CGFloat = 0
+    fileprivate var selectedAlpha: CGFloat = 0
+    fileprivate var normalRed: CGFloat = 0
+    fileprivate var normalGreen: CGFloat = 0
+    fileprivate var normalBlue: CGFloat = 0
+    fileprivate var normalAlpha: CGFloat = 0
+    fileprivate var sign: Int = 0
+    fileprivate var gap: CGFloat = 0
+    fileprivate var step: CGFloat = 0
+    fileprivate var link: CADisplayLink!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -95,31 +95,31 @@ class MenuItem: UILabel {
             self.rate = selected ? 1.0 : 0.0
             return
         }
-        _sign = (selected == true) ? 1 : -1
-        _gap = (selected == true) ? (1.0 - rate) : (rate - 0.0)
-        _step = _gap / speedFactor
+        sign = (selected == true) ? 1 : -1
+        gap = (selected == true) ? (1.0 - rate) : (rate - 0.0)
+        step = gap / speedFactor
         
-        if _link != nil {
-            _link.invalidate()
+        if link != nil {
+            link.remove(from: .main, forMode: .commonModes)
         }
-        let link = CADisplayLink(target: self, selector: #selector(rateChange))
-        link.add(to: RunLoop.main, forMode: .commonModes)
-        _link = link
+        let displayLink = CADisplayLink(target: self, selector: #selector(rateChange))
+        displayLink.add(to: RunLoop.main, forMode: .commonModes)
+        link = displayLink
         
     }
     
     @objc func rateChange() {
-        if _gap > 0.000001 {
-            _gap -= _step
-            guard _gap >= 0 else {
-                 self.rate = CGFloat(Int(self.rate + CGFloat(_sign) * _step + 0.5))
+        if gap > 0.000001 {
+            gap -= step
+            guard gap >= 0 else {
+                 self.rate = CGFloat(Int(self.rate + CGFloat(sign) * step + 0.5))
                 return
             }
-            self.rate += CGFloat(_sign) * _step
+            self.rate += CGFloat(sign) * step
         } else {
             self.rate = CGFloat(Int(self.rate + 0.5))
-            _link.invalidate()
-            _link = nil
+            link.invalidate()
+            link = nil
         }
     }
     
