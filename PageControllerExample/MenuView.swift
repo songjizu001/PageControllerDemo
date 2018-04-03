@@ -188,7 +188,6 @@ open class MenuView: UIView, MenuItemDelegate {
     public func slideMenuAtProgress(_ progress: CGFloat) {
         if self.progressView != nil {
             self.progressView?.progress = progress
-            print("_________________\(progress)")
         }
         let tag = Int(progress) + WMMENUITEM_TAG_OFFSET
         let rate: CGFloat = progress - CGFloat(tag) + CGFloat(WMMENUITEM_TAG_OFFSET)
@@ -209,7 +208,7 @@ open class MenuView: UIView, MenuItemDelegate {
         
     }
     
-    public func selectItemAtIndex(_ index: Int) {
+    func selectItemAtIndex(_ index: Int) {
         let tag = index + WMMENUITEM_TAG_OFFSET
         guard let _ = self.selItem else { return  }
         let currentIndex = (self.selItem?.tag)! - WMMENUITEM_TAG_OFFSET
@@ -221,8 +220,8 @@ open class MenuView: UIView, MenuItemDelegate {
         self.selItem?.setSelected(false, animation: false)
         self.selItem = item
         self.selItem?.setSelected(true, animation: false)
-        self.progressView?.moveToPostion(index)
-        //        self.progressView.setProgressWithOutAnimate(CGFloat(index))
+//        self.progressView?.moveToPostion(index)
+        self.progressView?.setProgressWithOutAnimate(CGFloat(index))
         //        delegate?.menuView?(self, didSelectedIndex: index, currentIndex)
         self.refreshContenOffset()
     }
