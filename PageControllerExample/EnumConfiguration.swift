@@ -11,14 +11,14 @@ import UIKit
     case selected
     case normal
 }
-public enum MenuViewStyle {
-    case `default`// 默认
-    case  line// 带下划线 (若要选中字体大小不变，设置选中和非选中大小一样即可)
-    case  triangle // 三角形 (progressHeight 为三角形的高, progressWidths 为底边长)
-    case  flood // 涌入效果 (填充)
-    case  floodHollow // 涌入效果 (空心的)
-    case  segmented // 涌入带边框,即网易新闻选项卡
-    
+
+public enum MenuViewStyle: Int {
+    case `default` = 1// 默认
+    case  line     = 2// 带下划线 (若要选中字体大小不变，设置选中和非选中大小一样即可)
+    case  triangle = 3// 三角形 (progressHeight 为三角形的高, progressWidths 为底边长)
+    case  flood    = 4// 涌入效果 (填充)
+    case  floodHollow = 5 // 涌入效果 (空心的)
+    case  segmented = 6// 涌入带边框,即网易新闻选项卡
 }
 
 public enum MenuViewLayoutMode {
@@ -39,4 +39,9 @@ public enum PreloadPolicy: Int {
     case never      = 0
     case neighbour  = 1
     case near       = 2
+}
+
+enum MenuViewPosition {
+    case `default`
+    case bottom
 }

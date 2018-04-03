@@ -101,6 +101,7 @@ class ProgressView: UIView {
         let nextX = self.itemFrames[nextIndex].origin.x
         var startX = currentX + (nextX - currentX) * rate
         var width = currentWidth + (nextWidth - currentWidth)*rate
+        print("=========width = \(width)==========")
         var endX = startX + width
         if self.naughty {
             let currentMidX = currentX + currentWidth / 2.0
@@ -118,6 +119,7 @@ class ProgressView: UIView {
         }
         let lineWidth: CGFloat = (self.hollow || self.hasBorder) ? 1.0 : 0.0
         if self.isTriangle {
+            print("startX = \(startX)---height = \(height) -- endX = \(endX)  -- width = \(width)")
             ctx?.move(to: CGPoint(x: startX, y: height))
             ctx?.addLine(to: CGPoint(x: endX, y: height))
             ctx?.addLine(to: CGPoint(x: startX + width / 2.0, y: 0))

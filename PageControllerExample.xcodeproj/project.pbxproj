@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A801F7F8205F47C500E66BD1 /* CustomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A801F7F7205F47C500E66BD1 /* CustomViewController.swift */; };
 		A801F7FA205F874200E66BD1 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A801F7F9205F874200E66BD1 /* FirstViewController.swift */; };
+		A81F4738207354D600BEDBAF /* SecondController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81F4737207354D600BEDBAF /* SecondController.swift */; };
 		A823155720527B24007527E4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A823155620527B24007527E4 /* AppDelegate.swift */; };
 		A823155920527B24007527E4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A823155820527B24007527E4 /* ViewController.swift */; };
 		A823155C20527B24007527E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A823155A20527B24007527E4 /* Main.storyboard */; };
@@ -23,6 +24,7 @@
 		A823158F20527CB0007527E4 /* PageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A823158E20527CB0007527E4 /* PageController.swift */; };
 		A86857D12064F663000A3DEB /* ProtocolMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86857D02064F663000A3DEB /* ProtocolMethod.swift */; };
 		A86857D32064F788000A3DEB /* EnumConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86857D22064F788000A3DEB /* EnumConfiguration.swift */; };
+		A86857D62071D273000A3DEB /* ExampleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86857D52071D273000A3DEB /* ExampleController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +47,7 @@
 /* Begin PBXFileReference section */
 		A801F7F7205F47C500E66BD1 /* CustomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewController.swift; sourceTree = "<group>"; };
 		A801F7F9205F874200E66BD1 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
+		A81F4737207354D600BEDBAF /* SecondController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondController.swift; sourceTree = "<group>"; };
 		A823155320527B24007527E4 /* PageControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PageControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A823155620527B24007527E4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A823155820527B24007527E4 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -65,6 +68,7 @@
 		A823158E20527CB0007527E4 /* PageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageController.swift; sourceTree = "<group>"; };
 		A86857D02064F663000A3DEB /* ProtocolMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolMethod.swift; sourceTree = "<group>"; };
 		A86857D22064F788000A3DEB /* EnumConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumConfiguration.swift; sourceTree = "<group>"; };
+		A86857D52071D273000A3DEB /* ExampleController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,8 +120,10 @@
 			isa = PBXGroup;
 			children = (
 				A823155620527B24007527E4 /* AppDelegate.swift */,
+				A86857D52071D273000A3DEB /* ExampleController.swift */,
 				A823155820527B24007527E4 /* ViewController.swift */,
 				A801F7F9205F874200E66BD1 /* FirstViewController.swift */,
+				A81F4737207354D600BEDBAF /* SecondController.swift */,
 				A86857D02064F663000A3DEB /* ProtocolMethod.swift */,
 				A86857D22064F788000A3DEB /* EnumConfiguration.swift */,
 				A823158720527BA8007527E4 /* MenuItem.swift */,
@@ -289,6 +295,7 @@
 				A801F7FA205F874200E66BD1 /* FirstViewController.swift in Sources */,
 				A86857D32064F788000A3DEB /* EnumConfiguration.swift in Sources */,
 				A823158B20527C84007527E4 /* MenuView.swift in Sources */,
+				A81F4738207354D600BEDBAF /* SecondController.swift in Sources */,
 				A823155920527B24007527E4 /* ViewController.swift in Sources */,
 				A823158820527BA8007527E4 /* MenuItem.swift in Sources */,
 				A823158F20527CB0007527E4 /* PageController.swift in Sources */,
@@ -296,6 +303,7 @@
 				A823155720527B24007527E4 /* AppDelegate.swift in Sources */,
 				A823158D20527C9E007527E4 /* ProgressView.swift in Sources */,
 				A801F7F8205F47C500E66BD1 /* CustomViewController.swift in Sources */,
+				A86857D62071D273000A3DEB /* ExampleController.swift in Sources */,
 				A86857D12064F663000A3DEB /* ProtocolMethod.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

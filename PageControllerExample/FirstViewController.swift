@@ -12,7 +12,7 @@ class FirstViewController: PageController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = UIColor.red
+        self.view.backgroundColor = UIColor.cyan
 
         // Do any additional setup after loading the view.
     }

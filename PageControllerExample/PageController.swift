@@ -30,7 +30,6 @@ open class PageController: UIViewController {
     open var selectIndex: Int {
         set {
             _selectIndex = newValue
-            markedSelectIndex = -1
             self.menuView?.selectItemAtIndex(selectIndex)
         }
         get {
@@ -180,7 +179,6 @@ open class PageController: UIViewController {
     fileprivate var shouldNotScroll: Bool = false
     fileprivate var initializedIndex: Int = -1
     fileprivate var controllerCount: Int = -1
-    fileprivate var markedSelectIndex: Int = -1
     /// 用于记录子控制器view的frame，用于 scrollView 上的展示的位置
     lazy fileprivate var childViewFrames = [CGRect]()
     /// 当前展示在屏幕上的控制器，方便在滚动的时候读取 (避免不必要计算)
@@ -298,9 +296,9 @@ open class PageController: UIViewController {
         self.calculateSize()
         self.addScrollView()
         self.addMenuView()
-        self.initializedControllerWithIndexIfNeeded(self._selectIndex)
+        self.initializedControllerWithIndexIfNeeded(_selectIndex)
         self.currentViewController = self.displayVC["\(self._selectIndex)"]
-        self.didEnterController(self.currentViewController!, self._selectIndex)
+        self.didEnterController(self.currentViewController!, _selectIndex)
         
     }
     open override func viewDidLayoutSubviews() {
@@ -310,14 +308,14 @@ open class PageController: UIViewController {
         }
         self.forceLayoutSubviews()
         hasInited = true
-        self.delaySelectIndexIfNeeded()
+//        self.delaySelectIndexIfNeeded()
     }
     
     fileprivate func didEnterController(_ vc: UIViewController, _ index: Int) {
-        guard self.childControllersCount != 0 else {
+        guard self.childControllersCount > 0 else {
             return
         }
-        self.postFullyDisplayedNotificationWithCurrentIndex(self._selectIndex)
+        self.postFullyDisplayedNotificationWithCurrentIndex(_selectIndex)
         let info = self.infoWithIndex(index)
         self.delegate?.pageController?(self, didEnterViewController: vc, withInfo: info)
         if initializedIndex == index {
@@ -412,6 +410,7 @@ open class PageController: UIViewController {
     fileprivate func calculateSize() {
         if let mFrame = self.dataSource?.pageController(pageController: self, preferredFrameForMenuView: self.menuView) {
             self.menuViewFrame = mFrame
+            childViewFrames.removeAll()
             if let cFrame = dataSource?.pageController(pageController: self, preferredFrameForContentView: self.scrollView) {
                 self.contentViewFrame = cFrame
                 for i in 0..<self.childControllersCount {
@@ -445,8 +444,9 @@ open class PageController: UIViewController {
     }
     
     func adjustDisplayingViewControllersFrame() {
-        for (index, key) in self.displayVC.keys.enumerated() {
-            let vcFrame = self.childViewFrames[index]
+        for (_, key) in self.displayVC.keys.enumerated() {
+            let index =  Int(key)
+            let vcFrame = self.childViewFrames[index!]
             let vc = displayVC[key]!
             vc.view.frame = vcFrame
         }
@@ -684,11 +684,11 @@ open class PageController: UIViewController {
         return CGFloat(ceil(itemWidth))
     }
     
-   fileprivate func delaySelectIndexIfNeeded() {
-        if self.markedSelectIndex != -1 {
-            self._selectIndex = self.markedSelectIndex
-        }
-    }
+//   fileprivate func delaySelectIndexIfNeeded() {
+//        if self.markedSelectIndex != -1 {
+//          _selectIndex = self.markedSelectIndex
+//        }
+//    }
     
 
     

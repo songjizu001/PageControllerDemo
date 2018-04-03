@@ -105,9 +105,9 @@ open class MenuView: UIView, MenuItemDelegate {
     fileprivate var selItem: MenuItem?
     lazy var frames: [CGRect] = [CGRect]()
     fileprivate var selectIndex: Int = 0
-    lazy var titlesCount: Int = {
+    fileprivate var titlesCount: Int {
         return self.dataSource.numbersOfTitlesInMenuView(self)
-    }()
+    }
     fileprivate let WMMENUITEM_TAG_OFFSET = 6250
     fileprivate let WMBADGEVIEW_TAG_OFFSET = 1212
     fileprivate var _progressHeight: CGFloat {
@@ -301,7 +301,7 @@ open class MenuView: UIView, MenuItemDelegate {
             if (contentSize.width - itemX) <= width / 2 {
                 targetX = contentSize.width - width
             } else {
-                targetX = frame?.origin.x ?? 0 - width / 2 + (frame?.size.width ?? 0) / 2
+                targetX = (frame?.origin.x)! - width / 2 + (frame?.size.width)! / 2
             }
             //应该有更好的解决办法
             if targetX + width > contentSize.width {
